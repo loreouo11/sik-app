@@ -1,0 +1,1482 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="dark">
+<title>食定未 — 唔使記得，影咗先算</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@700;900&family=Noto+Sans+TC:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    box-sizing:border-box;
+    padding-top:env(safe-area-inset-top,0px);
+    padding-bottom:env(safe-area-inset-bottom,0px);
+    --ink:#12201B;
+    --surface:#1B2A23;
+    --surface2:#23362C;
+    --surface3:#2C4234;
+    --line: rgba(245,239,224,0.14);
+    --mango:#F2B705;
+    --mango-deep:#C98F02;
+    --chilli:#E8543D;
+    --leaf:#6FBE8B;
+    --cream:#F5EFE0;
+    --muted:#9FB0A2;
+    --shadow: 0 18px 40px rgba(0,0,0,.45);
+  }
+  *{box-sizing:border-box;}
+  html,body{height:100%;margin:0;}
+  html{scroll-padding-top:env(safe-area-inset-top,0px);}
+  body{
+    background:#0B120F;
+    color:var(--cream);
+    font-family:"Noto Sans TC","Noto Sans CJK TC",sans-serif;
+    -webkit-font-smoothing:antialiased;
+    display:flex;
+    align-items:flex-start;
+    justify-content:center;
+    min-height:100%;
+  }
+  /* ambient backdrop only visible around the phone bezel on wide screens */
+  body::before{
+    content:"";
+    position:fixed; inset:0;
+    background:
+      radial-gradient(60% 50% at 50% 0%, rgba(242,183,5,0.10), transparent 60%),
+      radial-gradient(80% 60% at 50% 100%, rgba(111,190,139,0.08), transparent 60%),
+      #0B120F;
+    z-index:0;
+  }
+
+  .stage{
+    position:relative;
+    z-index:1;
+    width:100%;
+    max-width:430px;
+    min-height:100%;
+    margin:0 auto;
+  }
+  @media (min-width:640px){
+    .stage{
+      margin:28px auto 40px;
+      border-radius:40px;
+      overflow:hidden;
+      box-shadow:var(--shadow), 0 0 0 9px #05100B, 0 0 0 10px rgba(245,239,224,0.08);
+      min-height:860px;
+    }
+  }
+
+  .app{
+    position:relative;
+    background:linear-gradient(180deg, var(--ink), #0F1B16 70%);
+    min-height:100%;
+    padding-top:calc(env(safe-area-inset-top,0px) + 18px);
+    padding-bottom:calc(env(safe-area-inset-bottom,0px) + 110px);
+    padding-left:20px;
+    padding-right:20px;
+  }
+
+  h1,h2,h3{font-family:"Noto Serif TC",serif; font-weight:900; margin:0; color:var(--cream);}
+  p{margin:0;}
+  button{font-family:inherit; -webkit-tap-highlight-color:transparent;}
+
+  /* ---------- header ---------- */
+  .topbar{display:flex; align-items:center; justify-content:space-between; margin-bottom:18px;}
+  .brand{display:flex; align-items:baseline; gap:8px;}
+  .brand .wordmark{font-family:"Noto Serif TC",serif; font-weight:900; font-size:22px; letter-spacing:.5px;}
+  .brand .wordmark em{font-style:normal; color:var(--mango);}
+  .date-line{font-size:11.5px; color:var(--muted); margin-top:2px;}
+  .streak-pill{
+    display:flex; align-items:center; gap:5px;
+    background:var(--surface2); border:1px solid var(--line);
+    padding:7px 12px; border-radius:999px; font-size:13px; font-weight:700;
+  }
+  .streak-pill .flame{filter:saturate(1.3);}
+
+  /* ---------- today ring card ---------- */
+  .today-card{
+    background:var(--surface);
+    border:1px solid var(--line);
+    border-radius:26px;
+    padding:20px 18px 18px;
+    display:flex;
+    gap:16px;
+    align-items:center;
+    margin-bottom:14px;
+  }
+  .ring-wrap{position:relative; width:104px; height:104px; flex:0 0 auto;}
+  .ring-wrap svg{transform:rotate(-90deg);}
+  .ring-center{
+    position:absolute; inset:0; display:flex; flex-direction:column;
+    align-items:center; justify-content:center; text-align:center;
+  }
+  .ring-center .num{font-family:"Noto Serif TC",serif; font-weight:900; font-size:22px; line-height:1;}
+  .ring-center .unit{font-size:10px; color:var(--muted); margin-top:3px;}
+  .macros{flex:1; display:flex; flex-direction:column; gap:9px;}
+  .macro-row{display:flex; align-items:center; gap:8px; font-size:12px;}
+  .macro-row .label{width:34px; color:var(--muted); font-weight:600;}
+  .macro-row .bar{flex:1; height:6px; border-radius:4px; background:var(--surface3); overflow:hidden;}
+  .macro-row .bar > span{display:block; height:100%; border-radius:4px;}
+  .macro-row .val{width:56px; text-align:right; color:var(--muted); font-variant-numeric:tabular-nums;}
+  .goal-edit{
+    position:absolute; top:14px; right:14px;
+    background:none; border:none; color:var(--muted);
+    font-size:11px; text-decoration:underline; text-underline-offset:2px;
+    padding:4px;
+  }
+
+  /* ---------- water ---------- */
+  .water-card{
+    background:var(--surface); border:1px solid var(--line); border-radius:22px;
+    padding:14px 16px; margin-bottom:20px;
+    display:flex; align-items:center; justify-content:space-between;
+  }
+  .water-left{display:flex; align-items:center; gap:10px;}
+  .water-left .ico{font-size:20px;}
+  .water-left .txt .t1{font-weight:700; font-size:13.5px;}
+  .water-left .txt .t2{font-size:11px; color:var(--muted); margin-top:1px;}
+  .water-btn{
+    width:34px; height:34px; border-radius:50%;
+    background:var(--surface3); border:1px solid var(--line); color:var(--cream);
+    font-size:17px; display:flex; align-items:center; justify-content:center;
+  }
+  .water-btn:active{transform:scale(0.92);}
+
+  /* ---------- nudge ---------- */
+  .nudge{
+    display:flex; align-items:center; gap:12px;
+    background:linear-gradient(135deg, rgba(232,84,61,.16), rgba(242,183,5,.10));
+    border:1px solid rgba(242,183,5,.35);
+    border-radius:20px; padding:13px 15px; margin-bottom:20px;
+  }
+  .nudge .ico{font-size:22px;}
+  .nudge .txt{flex:1; font-size:12.5px; line-height:1.5;}
+  .nudge .txt b{display:block; font-size:13.5px; margin-bottom:1px;}
+  .nudge button{
+    background:var(--mango); color:#1B1400; border:none; border-radius:999px;
+    padding:8px 13px; font-weight:700; font-size:12px; white-space:nowrap;
+  }
+
+  /* ---------- section title ---------- */
+  .sec-title{display:flex; align-items:baseline; justify-content:space-between; margin:22px 0 10px;}
+  .sec-title h3{font-size:15px;}
+  .sec-title span{font-size:11px; color:var(--muted);}
+
+  /* ---------- log ticket ---------- */
+  .ticket{
+    background:var(--surface);
+    border:1px dashed var(--line);
+    border-radius:16px;
+    padding:13px 14px;
+    margin-bottom:10px;
+    display:flex; align-items:center; gap:12px;
+    position:relative;
+  }
+  .ticket .emo{font-size:24px; width:34px; text-align:center;}
+  .ticket .mid{flex:1; min-width:0;}
+  .ticket .mid .name{font-weight:700; font-size:13.5px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
+  .ticket .mid .meta{font-size:11px; color:var(--muted); margin-top:2px; letter-spacing:.3px;}
+  .ticket .kcal{font-family:"Noto Serif TC",serif; font-weight:900; font-size:15px; color:var(--mango); white-space:nowrap;}
+  .empty-log{
+    text-align:center; padding:30px 10px; color:var(--muted); font-size:12.5px; line-height:1.7;
+  }
+  .empty-log .big{font-size:30px; display:block; margin-bottom:8px;}
+
+  /* ---------- FAB + dock ---------- */
+  .dock{
+    position:fixed; left:0; right:0; bottom:0;
+    max-width:430px; margin:0 auto;
+    display:flex; align-items:flex-end; justify-content:center; gap:16px;
+    padding:0 20px calc(env(safe-area-inset-bottom,0px) + 20px);
+    pointer-events:none;
+    z-index:20;
+  }
+  .dock-btn{
+    pointer-events:auto;
+    background:var(--surface2); border:1px solid var(--line); color:var(--cream);
+    width:54px; height:54px; border-radius:50%; font-size:19px;
+    display:flex; align-items:center; justify-content:center;
+    box-shadow:0 8px 20px rgba(0,0,0,.35);
+  }
+  .dock-btn:active{transform:scale(0.94);}
+  .fab{
+    pointer-events:auto;
+    width:70px; height:70px; border-radius:50%;
+    background:radial-gradient(circle at 32% 28%, #FFDD6B, var(--mango) 60%, var(--mango-deep) 100%);
+    border:none; color:#1B1400; font-size:28px;
+    display:flex; align-items:center; justify-content:center;
+    box-shadow:0 12px 26px rgba(242,183,5,.4);
+    margin-top:-16px;
+  }
+  .fab:active{transform:scale(0.95);}
+
+  /* ---------- sheet ---------- */
+  .scrim{
+    position:fixed; inset:0; background:rgba(5,10,8,.6);
+    opacity:0; pointer-events:none; transition:opacity .22s ease;
+    z-index:30;
+  }
+  .scrim.show{opacity:1; pointer-events:auto;}
+  .sheet{
+    position:fixed; left:0; right:0; bottom:0;
+    max-width:430px; margin:0 auto;
+    background:var(--ink);
+    border:1px solid var(--line); border-bottom:none;
+    border-radius:26px 26px 0 0;
+    max-height:88vh;
+    transform:translateY(100%);
+    transition:transform .28s cubic-bezier(.2,.8,.25,1);
+    z-index:31;
+    display:flex; flex-direction:column;
+    box-shadow:0 -20px 50px rgba(0,0,0,.5);
+  }
+  .sheet.show{transform:translateY(0);}
+  .sheet-handle{width:38px; height:4px; background:var(--line); border-radius:3px; margin:12px auto 4px;}
+  .sheet-head{
+    display:flex; align-items:center; justify-content:space-between;
+    padding:8px 18px 12px;
+  }
+  .sheet-head h3{font-size:16px;}
+  .sheet-close{
+    background:var(--surface2); border:1px solid var(--line); color:var(--muted);
+    width:30px; height:30px; border-radius:50%; font-size:14px;
+  }
+  .sheet-body{
+    padding:4px 18px calc(env(safe-area-inset-bottom,0px) + 22px);
+    overflow-y:auto;
+  }
+
+  /* capture flow bits */
+  .snap-zone{
+    border:1.5px dashed var(--line); border-radius:20px;
+    padding:26px 16px; text-align:center; color:var(--muted);
+    font-size:12.5px; line-height:1.7; margin-bottom:14px;
+    position:relative;
+  }
+  .snap-zone .big{font-size:34px; display:block; margin-bottom:8px;}
+  .snap-zone input{position:absolute; inset:0; opacity:0; cursor:pointer;}
+  .preview-img{
+    width:100%; max-height:220px; object-fit:cover; border-radius:18px; margin-bottom:14px;
+    display:block;
+  }
+  .chat-row{display:flex; gap:10px; margin-bottom:14px; align-items:flex-start;}
+  .chat-avatar{
+    width:30px; height:30px; border-radius:50%; background:var(--surface3);
+    display:flex; align-items:center; justify-content:center; font-size:15px; flex:0 0 auto;
+  }
+  .chat-bubble{
+    background:var(--surface2); border:1px solid var(--line); border-radius:4px 16px 16px 16px;
+    padding:11px 13px; font-size:13px; line-height:1.6; flex:1;
+  }
+  .chat-bubble b{color:var(--mango);}
+  .result-card{
+    background:var(--surface); border:1px solid var(--line); border-radius:18px;
+    padding:14px 15px; margin-bottom:14px;
+  }
+  .result-head{display:flex; align-items:flex-start; gap:10px; margin-bottom:10px;}
+  .result-head .emo{font-size:26px; line-height:1.3;}
+  .result-head .name{font-weight:700; font-size:14.5px; display:inline;}
+  .result-head .edit-pencil-inline{font-size:11px; color:var(--muted); cursor:pointer; margin-left:6px;}
+  .edit-food-form input{
+    width:100%; background:var(--surface2); border:1px solid var(--mango); color:var(--cream);
+    border-radius:12px; padding:12px 14px; font-size:14px; font-family:inherit; margin-bottom:12px;
+  }
+  .items-chips{display:flex; flex-wrap:wrap; gap:5px; margin-top:5px;}
+  .items-chips span{
+    background:var(--surface3); border:1px solid var(--line); border-radius:8px;
+    font-size:10.5px; color:var(--cream); padding:2px 7px;
+  }
+  .result-head .kcal{font-family:"Noto Serif TC",serif; font-weight:900; font-size:17px; color:var(--mango); white-space:nowrap; padding-top:2px;}
+  .portion-note{font-size:11px; color:var(--muted); margin-top:2px;}
+  .result-macros{display:flex; gap:8px;}
+  .result-macros .m{
+    flex:1; background:var(--surface2); border-radius:10px; padding:7px 4px; text-align:center;
+  }
+  .result-macros .m .v{font-weight:700; font-size:13px;}
+  .result-macros .m .l{font-size:9.5px; color:var(--muted); margin-top:1px;}
+  .fiber-note{font-size:11px; color:var(--muted); margin-top:8px; text-align:right;}
+  .chip-row{display:flex; flex-wrap:wrap; gap:8px; margin:2px 0 14px;}
+  .chip{
+    background:var(--surface2); border:1px solid var(--line); color:var(--cream);
+    padding:9px 15px; border-radius:999px; font-size:12.5px; font-weight:600;
+  }
+  .chip:active{transform:scale(0.95); background:var(--surface3);}
+  .chip-outline{background:transparent; border:1px dashed var(--line); color:var(--muted);}
+  .loading-line{display:flex; align-items:center; gap:9px; font-size:12.5px; color:var(--muted); padding:6px 0 14px;}
+  .dot-pulse{width:7px; height:7px; border-radius:50%; background:var(--mango); animation:pulse 1s ease-in-out infinite;}
+  @keyframes pulse{0%,100%{opacity:.25} 50%{opacity:1}}
+
+  .btn-primary{
+    width:100%; background:var(--mango); color:#1B1400; border:none;
+    padding:14px; border-radius:16px; font-weight:700; font-size:14.5px;
+  }
+  .btn-primary:active{transform:scale(0.98);}
+  .btn-ghost{
+    width:100%; background:transparent; color:var(--muted); border:1px solid var(--line);
+    padding:12px; border-radius:16px; font-weight:600; font-size:13px; margin-top:8px;
+  }
+  .catch-item{
+    background:var(--surface); border:1px solid var(--line); border-radius:16px;
+    padding:11px 12px; margin-bottom:10px; display:flex; align-items:center; gap:11px;
+  }
+  .catch-item img{width:44px; height:44px; border-radius:10px; object-fit:cover; flex:0 0 auto;}
+  .catch-item .catch-emo{
+    width:44px; height:44px; border-radius:10px; background:var(--surface2);
+    display:flex; align-items:center; justify-content:center; font-size:20px; flex:0 0 auto;
+  }
+  .catch-item .mid{flex:1; min-width:0;}
+  .catch-item .mid .n{font-weight:700; font-size:12.5px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
+  .catch-item .mid .k{font-size:11px; color:var(--muted); margin-top:1px;}
+  .catch-item .toggle{
+    width:26px; height:26px; border-radius:50%; border:1.5px solid var(--line);
+    display:flex; align-items:center; justify-content:center; font-size:13px; color:transparent;
+    flex:0 0 auto;
+  }
+  .catch-item.on .toggle{background:var(--leaf); border-color:var(--leaf); color:#0B2015;}
+  .catch-item.pending{opacity:.5;}
+  .catch-item .edit-pencil{
+    font-size:11px; color:var(--muted); margin-left:4px; cursor:pointer; opacity:0.8;
+  }
+  .catch-item.editing{align-items:flex-start;}
+  .catch-edit-row{flex:1; min-width:0;}
+  .catch-edit-row input{
+    width:100%; background:var(--surface2); border:1px solid var(--mango); color:var(--cream);
+    border-radius:10px; padding:8px 10px; font-size:12.5px; font-family:inherit; margin-bottom:6px;
+  }
+  .catch-edit-row .catch-edit-btns{display:flex; gap:8px;}
+  .catch-edit-row .catch-edit-btns button{
+    flex:1; padding:7px; border-radius:10px; font-size:11.5px; font-weight:700; border:none; font-family:inherit;
+  }
+  .catch-edit-row .catch-edit-save{background:var(--mango); color:#2B1D02;}
+  .catch-edit-row .catch-edit-cancel{background:var(--surface2); color:var(--muted);}
+
+  .goal-form label{font-size:12px; color:var(--muted); display:block; margin-bottom:6px;}
+  .goal-form input{
+    width:100%; background:var(--surface2); border:1px solid var(--line); color:var(--cream);
+    border-radius:12px; padding:12px 14px; font-size:16px; margin-bottom:16px; font-family:inherit;
+  }
+  .account-section label{font-size:12px; color:var(--muted); display:block; margin-bottom:6px;}
+  .account-section input{
+    width:100%; background:var(--surface2); border:1px solid var(--line); color:var(--cream);
+    border-radius:12px; padding:12px 14px; font-size:16px; margin-bottom:12px; font-family:inherit;
+  }
+
+  .text-entry textarea{
+    width:100%; background:var(--surface2); border:1px solid var(--line); color:var(--cream);
+    border-radius:14px; padding:12px 14px; font-size:14.5px; font-family:inherit;
+    resize:vertical; line-height:1.6;
+  }
+  .text-entry textarea::placeholder{color:var(--muted);}
+  .link-btn{
+    background:none; border:none; color:var(--muted); font-size:12px;
+    text-decoration:underline; text-underline-offset:2px; padding:6px; font-family:inherit;
+  }
+
+  .toast{
+    position:fixed; left:50%; bottom:calc(env(safe-area-inset-bottom,0px) + 108px);
+    transform:translateX(-50%) translateY(16px);
+    background:var(--surface3); border:1px solid var(--line); color:var(--cream);
+    padding:11px 18px; border-radius:999px; font-size:12.5px; font-weight:600;
+    opacity:0; pointer-events:none; transition:all .25s ease; z-index:40; max-width:88%;
+    text-align:center; box-shadow:0 10px 24px rgba(0,0,0,.4);
+  }
+  .toast.show{opacity:1; transform:translateX(-50%) translateY(0);}
+
+  .visually-hidden{position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0,0,0,0);}
+  ::selection{background:var(--mango); color:#1B1400;}
+</style>
+</head>
+<body>
+
+<div class="stage">
+  <div class="app" id="app">
+
+    <div class="topbar">
+      <div class="brand">
+        <div>
+          <div class="wordmark">食定<em>未</em></div>
+          <div class="date-line" id="dateLine"></div>
+        </div>
+      </div>
+      <div class="streak-pill"><span class="flame">🔥</span><span id="streakNum">0</span> 日</div>
+    </div>
+
+    <div class="today-card">
+      <button class="goal-edit" id="goalEditBtn">改目標</button>
+      <div class="ring-wrap">
+        <svg width="104" height="104" viewBox="0 0 104 104">
+          <circle cx="52" cy="52" r="45" fill="none" stroke="#2C4234" stroke-width="10"/>
+          <circle id="ringProgress" cx="52" cy="52" r="45" fill="none" stroke="#F2B705" stroke-width="10"
+                  stroke-linecap="round" stroke-dasharray="283" stroke-dashoffset="283"/>
+        </svg>
+        <div class="ring-center">
+          <div class="num" id="kcalNum">0</div>
+          <div class="unit">/ <span id="kcalGoal">1800</span> 千卡</div>
+        </div>
+      </div>
+      <div class="macros">
+        <div class="macro-row"><span class="label">蛋白</span><div class="bar"><span id="barP" style="width:0%;background:#6FBE8B"></span></div><span class="val" id="valP">0/90g</span></div>
+        <div class="macro-row"><span class="label">碳水</span><div class="bar"><span id="barC" style="width:0%;background:#F2B705"></span></div><span class="val" id="valC">0/200g</span></div>
+        <div class="macro-row"><span class="label">脂肪</span><div class="bar"><span id="barF" style="width:0%;background:#E8543D"></span></div><span class="val" id="valF">0/60g</span></div>
+        <div class="macro-row"><span class="label">纖維</span><div class="bar"><span id="barFib" style="width:0%;background:#8FBF6F"></span></div><span class="val" id="valFib">0/25g</span></div>
+      </div>
+    </div>
+
+    <div class="water-card">
+      <div class="water-left">
+        <div class="ico">💧</div>
+        <div class="txt">
+          <div class="t1"><span id="waterNum">0</span> 杯 · <span id="waterMl">0</span>ml</div>
+          <div class="t2">目標 <span id="waterGoalMl"></span>ml（每杯約250ml）</div>
+        </div>
+      </div>
+      <button class="water-btn" id="waterBtn">+</button>
+    </div>
+
+    <div id="nudgeSlot"></div>
+
+    <div class="sec-title"><h3>今日記錄</h3><span id="logCount"></span></div>
+    <div id="logList"></div>
+
+  </div>
+</div>
+
+<div class="dock">
+  <button class="dock-btn" id="openCatchup" title="補記">🗂️</button>
+  <button class="fab" id="openCapture" title="影相記錄">📷</button>
+  <button class="dock-btn" id="openGoal" title="目標">🎯</button>
+</div>
+
+<!-- ================= CAPTURE SHEET ================= -->
+<div class="scrim" id="scrimCapture"></div>
+<div class="sheet" id="sheetCapture">
+  <div class="sheet-handle"></div>
+  <div class="sheet-head"><h3>影低佢</h3><button class="sheet-close" data-close="capture">✕</button></div>
+  <div class="sheet-body" id="captureBody"></div>
+</div>
+
+<!-- ================= CATCH-UP SHEET ================= -->
+<div class="scrim" id="scrimCatchup"></div>
+<div class="sheet" id="sheetCatchup">
+  <div class="sheet-handle"></div>
+  <div class="sheet-head"><h3>一次過惡補</h3><button class="sheet-close" data-close="catchup">✕</button></div>
+  <div class="sheet-body" id="catchupBody"></div>
+</div>
+
+<!-- ================= GOAL SHEET ================= -->
+<div class="scrim" id="scrimGoal"></div>
+<div class="sheet" id="sheetGoal">
+  <div class="sheet-handle"></div>
+  <div class="sheet-head"><h3>今日目標</h3><button class="sheet-close" data-close="goal">✕</button></div>
+  <div class="sheet-body">
+    <div class="goal-form">
+      <label>每日卡路里目標（千卡）</label>
+      <input type="number" id="goalInput" inputmode="numeric">
+      <button class="btn-primary" id="goalSave">儲存</button>
+      <div class="link-btn" id="openProfileCalc" style="margin-top:12px;text-align:center;">或者：等我根據你嘅資料幫你計 →</div>
+      <div id="profileCalcForm" style="display:none;margin-top:14px;">
+        <label>體重（kg）</label>
+        <input type="number" id="pfWeight" inputmode="decimal">
+        <label>身高（cm）</label>
+        <input type="number" id="pfHeight" inputmode="decimal">
+        <label>年齡</label>
+        <input type="number" id="pfAge" inputmode="numeric">
+        <label>性別</label>
+        <select id="pfSex" style="width:100%;background:var(--surface2);border:1px solid var(--line);color:var(--cream);border-radius:12px;padding:12px 14px;font-size:16px;margin-bottom:16px;font-family:inherit;">
+          <option value="m">男</option>
+          <option value="f">女</option>
+        </select>
+        <label>日常活動量</label>
+        <select id="pfActivity" style="width:100%;background:var(--surface2);border:1px solid var(--line);color:var(--cream);border-radius:12px;padding:12px 14px;font-size:16px;margin-bottom:16px;font-family:inherit;">
+          <option value="1.2">少郁動（少運動/坐辦公室）</option>
+          <option value="1.375" selected>一般（每星期運動1-3次）</option>
+          <option value="1.55">常運動（每星期運動4次以上）</option>
+        </select>
+        <label>目標</label>
+        <select id="pfGoal" style="width:100%;background:var(--surface2);border:1px solid var(--line);color:var(--cream);border-radius:12px;padding:12px 14px;font-size:16px;margin-bottom:16px;font-family:inherit;">
+          <option value="cut">減重</option>
+          <option value="maintain">維持</option>
+          <option value="bulk">增肌</option>
+          <option value="recomp">減重+增肌（同時）</option>
+        </select>
+        <div id="recompNote" style="display:none;font-size:11px;color:var(--muted);margin:-8px 0 14px 0;line-height:1.6;">
+          呢個玩法對新手／體脂偏高、未訓練開始嘅人最有效；如果你已經練咗一排、體脂已經幾低，同時減脂加增肌會好慢，甚至好難做到——呢個係老實講，唔係唔支持你試。
+        </div>
+        <button class="btn-primary" id="pfCalcBtn">自動幫我計</button>
+        <div id="pfResult" style="display:none;margin-top:14px;background:var(--surface2);border:1px solid var(--line);border-radius:12px;padding:12px 14px;">
+          <div style="font-size:12.5px;color:var(--muted);margin-bottom:8px;">計出嚟嘅每日目標：</div>
+          <div style="font-family:'Noto Serif TC',serif;font-weight:900;font-size:22px;color:var(--mango);" id="pfKcalOut">0 千卡</div>
+          <div style="display:flex;gap:8px;margin-top:10px;">
+            <div style="flex:1;text-align:center;"><div style="font-weight:700;font-size:13px;" id="pfPOut">0g</div><div style="font-size:9.5px;color:var(--muted);">蛋白質</div></div>
+            <div style="flex:1;text-align:center;"><div style="font-weight:700;font-size:13px;" id="pfCOut">0g</div><div style="font-size:9.5px;color:var(--muted);">碳水</div></div>
+            <div style="flex:1;text-align:center;"><div style="font-weight:700;font-size:13px;" id="pfFOut">0g</div><div style="font-size:9.5px;color:var(--muted);">脂肪</div></div>
+          </div>
+          <button class="btn-primary" id="pfApplyBtn" style="margin-top:12px;">用呢個做我嘅目標</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="account-section" style="margin-top:20px;border-top:1px solid var(--line);padding-top:16px;">
+      <div id="acctLoggedOut">
+        <div style="font-size:12.5px;color:var(--muted);margin-bottom:10px;">諗住換第二部機、或者清咗瀏覽器資料都想攞返自己個設定？可以用email備份。</div>
+        <label>Email</label>
+        <input type="email" id="acctEmail" inputmode="email" autocomplete="email">
+        <label>密碼</label>
+        <input type="password" id="acctPassword" autocomplete="current-password">
+        <div style="display:flex;gap:8px;margin-top:6px;">
+          <button class="btn-primary" id="acctRegisterBtn" style="flex:1;">註冊</button>
+          <button class="btn-ghost" id="acctLoginBtn" style="flex:1;">登入</button>
+        </div>
+        <div class="link-btn" id="acctForgotBtn" style="margin-top:10px;text-align:center;">忘記密碼？</div>
+
+        <div id="acctResetForm" style="display:none;margin-top:12px;">
+          <label>輸入你email收到嘅驗證碼</label>
+          <input type="text" id="acctResetToken">
+          <label>新密碼</label>
+          <input type="password" id="acctNewPassword" autocomplete="new-password">
+          <button class="btn-primary" id="acctResetSubmitBtn">重設密碼</button>
+        </div>
+      </div>
+
+      <div id="acctLoggedIn" style="display:none;">
+        <div style="font-size:12.5px;color:var(--muted);">已登入：<span id="acctEmailDisplay" style="color:var(--cream);font-weight:600;"></span></div>
+        <button class="btn-ghost" id="acctLogoutBtn" style="margin-top:10px;">登出</button>
+      </div>
+    </div>
+
+    <button class="btn-ghost" id="resetDataBtn" style="margin-top:18px;color:var(--chilli);border-color:var(--chilli);">清空所有記錄</button>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+(function(){
+  "use strict";
+
+  // ---------- persistence ----------
+  var LS_ENTRIES = "sdm_entries_v1";
+  var LS_WATER = "sdm_water_v1";
+  var LS_GOAL = "sdm_goal_v1";
+  var LS_PROFILE = "sdm_profile_v1";
+  var LS_MACROGOALS = "sdm_macrogoals_v1";
+  var LS_ACCOUNT = "sdm_account_v1";
+  var WATER_CUP_ML = 250;   // fixed assumption, no customization — keeps logging one tap
+  var WATER_GOAL_ML = 2000; // ~8 cups/day, the common baseline
+
+  var API_URL = "https://script.google.com/macros/s/AKfycbzP2M0hrTW4nOxgCS2zfTUcPtQnEEBdvwEqMqX3aAW_mDidL2nuRbu2oKxQ2dJypQkm/exec";
+  function apiCall(action, payload){
+    var body = Object.assign({action:action}, payload||{});
+    return new Promise(function(resolve){
+      var xhr = new XMLHttpRequest();
+      xhr.open("POST", API_URL, true);
+      xhr.timeout = 15000;
+      xhr.onload = function(){
+        if(xhr.status < 200 || xhr.status >= 300){
+          resolve({ok:false, error:"http_"+xhr.status});
+          return;
+        }
+        try{
+          resolve(JSON.parse(xhr.responseText));
+        }catch(e){
+          resolve({ok:false, error:"parse_error"});
+        }
+      };
+      xhr.onerror = function(){ resolve({ok:false, error:"network_error"}); };
+      xhr.ontimeout = function(){ resolve({ok:false, error:"timeout"}); };
+      xhr.send(JSON.stringify(body));
+    });
+  }
+
+  function todayKey(d){
+    d = d || new Date();
+    return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");
+  }
+  function safeGet(key, fallback){
+    try{
+      var raw = localStorage.getItem(key);
+      if(raw===null) return fallback;
+      return JSON.parse(raw);
+    }catch(e){ return fallback; }
+  }
+  function safeSet(key, val){
+    try{ localStorage.setItem(key, JSON.stringify(val)); }catch(e){ /* storage unavailable: state stays in memory only */ }
+  }
+
+  var state = {
+    entries: safeGet(LS_ENTRIES, []),          // {id, ts, food, emoji, calories, protein, carbs, fat, comment}
+    water: safeGet(LS_WATER, {}),               // {"2026-09-22": 3}
+    goal: safeGet(LS_GOAL, 1800),
+    profile: safeGet(LS_PROFILE, null),         // {weight,height,age,sex,activity,goalType}
+    macroGoals: safeGet(LS_MACROGOALS, null),   // {p,c,f,fib} — personalized macro targets, null = use fixed ratio
+    account: safeGet(LS_ACCOUNT, null)          // {email, anon_id} — set after register/login
+  };
+
+  function persist(){
+    safeSet(LS_ENTRIES, state.entries);
+    safeSet(LS_WATER, state.water);
+    safeSet(LS_GOAL, state.goal);
+    safeSet(LS_PROFILE, state.profile);
+    safeSet(LS_MACROGOALS, state.macroGoals);
+    safeSet(LS_ACCOUNT, state.account);
+  }
+
+  // ---------- personalized goal calc (Mifflin-St Jeor BMR + activity multiplier) ----------
+  function calcPersonalGoal(p){
+    // BMR (Mifflin-St Jeor): men = 10w+6.25h-5a+5, women = 10w+6.25h-5a-161
+    var bmr = 10*p.weight + 6.25*p.height - 5*p.age + (p.sex==="m" ? 5 : -161);
+    var tdee = bmr * p.activity;
+    var kcal;
+    if(p.goalType==="cut") kcal = tdee * 0.82;         // ~18% deficit
+    else if(p.goalType==="bulk") kcal = tdee * 1.12;   // ~12% surplus
+    else if(p.goalType==="recomp") kcal = tdee * 0.95; // ~5% mild deficit — small enough not to force muscle loss
+    else kcal = tdee;                                   // maintain
+    kcal = Math.round(kcal/10)*10;
+    // protein target by goal (g per kg bodyweight), fat floor, carbs = remainder
+    var proteinPerKg = p.goalType==="cut" ? 2.2 : (p.goalType==="bulk" ? 2.0 : (p.goalType==="recomp" ? 2.4 : 1.8));
+    var proteinG = Math.round(p.weight * proteinPerKg);
+    var fatG = Math.round(kcal * 0.25 / 9);  // ~25% of cal from fat as a floor
+    var remainingKcal = kcal - (proteinG*4) - (fatG*9);
+    var carbsG = Math.max(0, Math.round(remainingKcal/4));
+    var fibG = Math.max(20, Math.round(kcal/1000*14));
+    return {kcal:kcal, p:proteinG, c:carbsG, f:fatG, fib:fibG};
+  }
+
+  // ---------- AI（自家backend，唔使用戶有Claude account） ----------
+  var sampleFn = true;   // keep變量名不變，減少後面要改嘅地方；true=AI已經ready
+  var imagesOK = true;   // 影相分析對所有人都開放
+  function initClaude(){ /* 已經唔使初始化任何Claude capability，留空function避免其他地方call錯 */ }
+
+  function fileToBase64(file){
+    return new Promise(function(resolve, reject){
+      var reader = new FileReader();
+      reader.onload = function(){
+        var result = reader.result || "";
+        var comma = result.indexOf(",");
+        resolve(comma===-1 ? result : result.slice(comma+1));
+      };
+      reader.onerror = function(){ reject(new Error("read_failed")); };
+      reader.readAsDataURL(file);
+    });
+  }
+
+  function mapAiErrorCode(err){
+    switch(err){
+      case "missing_api_key": return "not_granted";
+      case "invalid_json": return "invalid_json";
+      case "missing_content": return "invalid_json";
+      case "timeout": return "upstream_error";
+      case "network_error": return "upstream_error";
+      case "parse_error": return "invalid_json";
+      default:
+        if(String(err).indexOf("api_error_429")===0) return "rate_limited";
+        return "upstream_error";
+    }
+  }
+
+  // 統一AI分析入口：代替以前嘅 sampleFn.json(prompt, opts)
+  async function aiAnalyze(prompt, file){
+    var imageBase64 = null, imageMediaType = null;
+    if(file){
+      imageBase64 = await fileToBase64(file);
+      imageMediaType = file.type || "image/jpeg";
+    }
+    var res = await apiCall("analyzeFood", { prompt: prompt, imageBase64: imageBase64, imageMediaType: imageMediaType });
+    if(!res.ok){
+      var err = new Error(res.error||"unknown");
+      err.code = mapAiErrorCode(res.error);
+      throw err;
+    }
+    return res.data;
+  }
+
+  function errCopy(code){
+    var map = {
+      not_granted: "AI服務未設定好，可以話俾開發者知。",
+      sampling_disabled: "呢個帳號暫時未有AI分析功能。",
+      images_unavailable: "呢度影相分析暫時用唔到，可以手動輸入。",
+      image_rejected: "張相有啲問題，換張相再試下？",
+      rate_limited: "太密call喇，等一陣先再試。",
+      refused: "AI答唔到呢個，換個角度再試下。",
+      invalid_json: "AI答得有啲亂，撳「重新分析」再試一次。",
+      upstream_error: "連線唔穩定，撳「重新分析」再試一次。",
+      cancelled: ""
+    };
+    return map[code] || "出咗少少問題，再試一次啦。";
+  }
+
+  // ---------- toast ----------
+  var toastTimer=null;
+  function toast(msg){
+    var el = document.getElementById("toast");
+    el.textContent = msg;
+    el.classList.add("show");
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(function(){ el.classList.remove("show"); }, 2400);
+  }
+
+  // ---------- streak ----------
+  function computeStreak(){
+    var dates = {};
+    state.entries.forEach(function(e){ dates[todayKey(new Date(e.ts))] = true; });
+    var d = new Date();
+    var todayHas = dates[todayKey(d)];
+    if(!todayHas){ d.setDate(d.getDate()-1); } // grace: start counting from yesterday if today empty so far
+    var count = 0;
+    while(dates[todayKey(d)]){
+      count++;
+      d.setDate(d.getDate()-1);
+    }
+    return count;
+  }
+
+  // ---------- render ----------
+  function fmtDate(){
+    var d = new Date();
+    var days = ["日","一","二","三","四","五","六"];
+    return (d.getMonth()+1)+"月"+d.getDate()+"日 星期"+days[d.getDay()];
+  }
+
+  function todaysEntries(){
+    var k = todayKey();
+    return state.entries.filter(function(e){ return todayKey(new Date(e.ts))===k; })
+      .sort(function(a,b){ return new Date(b.ts)-new Date(a.ts); });
+  }
+
+  function render(){
+    document.getElementById("dateLine").textContent = fmtDate();
+    document.getElementById("streakNum").textContent = computeStreak();
+
+    var list = todaysEntries();
+    var totals = list.reduce(function(acc,e){
+      acc.kcal += Number(e.calories)||0;
+      acc.p += Number(e.protein)||0;
+      acc.c += Number(e.carbs)||0;
+      acc.f += Number(e.fat)||0;
+      acc.fib += Number(e.fiber)||0;
+      return acc;
+    }, {kcal:0,p:0,c:0,f:0,fib:0});
+
+    document.getElementById("kcalNum").textContent = Math.round(totals.kcal);
+    document.getElementById("kcalGoal").textContent = state.goal;
+    var pct = Math.max(0, Math.min(1, totals.kcal/state.goal));
+    var circ = 283;
+    document.getElementById("ringProgress").style.strokeDashoffset = String(circ*(1-pct));
+
+    var goalP, goalC, goalF, goalFib;
+    if(state.macroGoals){
+      goalP = state.macroGoals.p; goalC = state.macroGoals.c;
+      goalF = state.macroGoals.f; goalFib = state.macroGoals.fib;
+    }else{
+      goalP = Math.round(state.goal*0.20/4);   // ~20% cal from protein
+      goalC = Math.round(state.goal*0.45/4);   // ~45% from carbs
+      goalF = Math.round(state.goal*0.30/9);   // ~30% from fat
+      goalFib = Math.max(20, Math.round(state.goal/1000*14)); // ~14g per 1000kcal, floor 20g
+    }
+    setBar("P", totals.p, goalP); setBar("C", totals.c, goalC); setBar("F", totals.f, goalF);
+    setBar("Fib", totals.fib, goalFib);
+
+    var cups = state.water[todayKey()] || 0;
+    document.getElementById("waterNum").textContent = cups;
+    document.getElementById("waterMl").textContent = cups * WATER_CUP_ML;
+    document.getElementById("waterGoalMl").textContent = WATER_GOAL_ML;
+
+    document.getElementById("goalInput").value = state.goal;
+
+    // log list
+    var logEl = document.getElementById("logList");
+    document.getElementById("logCount").textContent = list.length ? list.length+" 項" : "";
+    if(!list.length){
+      logEl.innerHTML = '<div class="empty-log"><span class="big">🍃</span>今日仲未記過嘢<br>撳下面粒黃色掣，影相就得</div>';
+    }else{
+      logEl.innerHTML = list.map(function(e){
+        var t = new Date(e.ts);
+        var hh = String(t.getHours()).padStart(2,"0"), mm = String(t.getMinutes()).padStart(2,"0");
+        return '<div class="ticket">'+
+          '<div class="emo">'+(e.emoji||"🍽️")+'</div>'+
+          '<div class="mid"><div class="name">'+escapeHtml(e.food)+(e.portionNote?' <span style="color:var(--muted);font-weight:400;">· '+escapeHtml(e.portionNote)+'</span>':'')+'</div>'+
+          '<div class="meta">'+hh+':'+mm+' · 蛋白 '+Math.round(e.protein)+'g · 碳水 '+Math.round(e.carbs)+'g · 脂肪 '+Math.round(e.fat)+'g</div></div>'+
+          '<div class="kcal">'+Math.round(e.calories)+'</div>'+
+        '</div>';
+      }).join("");
+    }
+
+    // nudge
+    var nudgeEl = document.getElementById("nudgeSlot");
+    var hour = new Date().getHours();
+    if(list.length===0 && hour>=13){
+      nudgeEl.innerHTML = '<div class="nudge"><div class="ico">🫠</div>'+
+        '<div class="txt"><b>今日仲未記過嘢喎</b>唔緊要，一次過影晒手機入面啲食物相，幫你惡補返</div>'+
+        '<button id="nudgeBtn">惡補</button></div>';
+      document.getElementById("nudgeBtn").onclick = function(){ openSheet("catchup"); };
+    }else if(list.length===0){
+      nudgeEl.innerHTML = '';
+    }else{
+      nudgeEl.innerHTML = '';
+    }
+  }
+
+  function setBar(letter, val, goal){
+    var pct = goal>0 ? Math.max(0,Math.min(1, val/goal)) : 0;
+    document.getElementById("bar"+letter).style.width = (pct*100).toFixed(0)+"%";
+    document.getElementById("val"+letter).textContent = Math.round(val)+"/"+goal+"g";
+  }
+
+  function escapeHtml(s){
+    return String(s==null?"":s).replace(/[&<>"']/g, function(c){
+      return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c];
+    });
+  }
+
+  // ---------- sheets ----------
+  function openSheet(name){
+    document.getElementById("scrim"+cap(name)).classList.add("show");
+    document.getElementById("sheet"+cap(name)).classList.add("show");
+    if(name==="capture") renderCapture();
+    if(name==="catchup") renderCatchup();
+    if(name==="goal"){ prefillProfileForm(); updateAccountUI(); }
+  }
+  function updateAccountUI(){
+    var loggedIn = !!(state.account && state.account.anon_id);
+    document.getElementById("acctLoggedOut").style.display = loggedIn ? "none" : "block";
+    document.getElementById("acctLoggedIn").style.display = loggedIn ? "block" : "none";
+    if(loggedIn) document.getElementById("acctEmailDisplay").textContent = state.account.email;
+  }
+  function prefillProfileForm(){
+    var p = state.profile;
+    if(!p) return;
+    document.getElementById("pfWeight").value = p.weight;
+    document.getElementById("pfHeight").value = p.height;
+    document.getElementById("pfAge").value = p.age;
+    document.getElementById("pfSex").value = p.sex;
+    document.getElementById("pfActivity").value = p.activity;
+    document.getElementById("pfGoal").value = p.goalType;
+    document.getElementById("recompNote").style.display = (p.goalType==="recomp") ? "block" : "none";
+  }
+  function closeSheet(name){
+    document.getElementById("scrim"+cap(name)).classList.remove("show");
+    document.getElementById("sheet"+cap(name)).classList.remove("show");
+  }
+  function cap(s){ return s.charAt(0).toUpperCase()+s.slice(1); }
+
+  ["capture","catchup","goal"].forEach(function(name){
+    document.getElementById("scrim"+cap(name)).addEventListener("click", function(){ closeSheet(name); });
+  });
+  document.querySelectorAll("[data-close]").forEach(function(btn){
+    btn.addEventListener("click", function(){ closeSheet(btn.getAttribute("data-close")); });
+  });
+  document.getElementById("openCapture").addEventListener("click", function(){ openSheet("capture"); });
+  document.getElementById("openCatchup").addEventListener("click", function(){ openSheet("catchup"); });
+  document.getElementById("openGoal").addEventListener("click", function(){ openSheet("goal"); });
+  document.getElementById("goalEditBtn").addEventListener("click", function(){ openSheet("goal"); });
+  document.getElementById("goalSave").addEventListener("click", function(){
+    var v = parseInt(document.getElementById("goalInput").value, 10);
+    if(v && v>300 && v<6000){ state.goal=v; persist(); render(); closeSheet("goal"); toast("目標更新咗喇"); }
+    else{ toast("輸入一個合理啲嘅數字先"); }
+  });
+  document.getElementById("openProfileCalc").addEventListener("click", function(){
+    var f = document.getElementById("profileCalcForm");
+    f.style.display = (f.style.display==="none") ? "block" : "none";
+  });
+  document.getElementById("pfGoal").addEventListener("change", function(){
+    document.getElementById("recompNote").style.display = (this.value==="recomp") ? "block" : "none";
+  });
+  document.getElementById("pfCalcBtn").addEventListener("click", function(){
+    var weight = parseFloat(document.getElementById("pfWeight").value);
+    var height = parseFloat(document.getElementById("pfHeight").value);
+    var age = parseInt(document.getElementById("pfAge").value, 10);
+    var sex = document.getElementById("pfSex").value;
+    var activity = parseFloat(document.getElementById("pfActivity").value);
+    var goalType = document.getElementById("pfGoal").value;
+    if(!weight || weight<=0 || weight>300){ toast("體重輸入得唔啱"); return; }
+    if(!height || height<=0 || height>250){ toast("身高輸入得唔啱"); return; }
+    if(!age || age<=0 || age>120){ toast("年齡輸入得唔啱"); return; }
+    var profile = {weight:weight, height:height, age:age, sex:sex, activity:activity, goalType:goalType};
+    var result = calcPersonalGoal(profile);
+    document.getElementById("pfResult").style.display = "block";
+    document.getElementById("pfKcalOut").textContent = result.kcal + " 千卡";
+    document.getElementById("pfPOut").textContent = result.p + "g";
+    document.getElementById("pfCOut").textContent = result.c + "g";
+    document.getElementById("pfFOut").textContent = result.f + "g";
+    document.getElementById("pfApplyBtn").onclick = function(){
+      state.profile = profile;
+      state.goal = result.kcal;
+      state.macroGoals = {p:result.p, c:result.c, f:result.f, fib:result.fib};
+      persist(); render(); closeSheet("goal");
+      toast("已經幫你設定好個人化目標");
+      syncProfileToServer();
+    };
+  });
+
+  function syncProfileToServer(){
+    if(!(state.account && state.account.anon_id)) return; // 冇登入就淨係keep喺local，唔send
+    apiCall("saveProfile", {
+      anon_id: state.account.anon_id,
+      profile: state.profile,
+      macroGoals: state.macroGoals ? {
+        kcal: state.goal, p: state.macroGoals.p, c: state.macroGoals.c, f: state.macroGoals.f, fib: state.macroGoals.fib
+      } : null
+    });
+  }
+
+  document.getElementById("acctRegisterBtn").addEventListener("click", function(){
+    var email = document.getElementById("acctEmail").value.trim();
+    var password = document.getElementById("acctPassword").value;
+    if(!email || email.indexOf("@")===-1){ toast("Email格式唔啱"); return; }
+    if(!password || password.length<6){ toast("密碼要至少6個字"); return; }
+    apiCall("register", {email:email, password:password}).then(function(res){
+      if(!res.ok){
+        if(res.error==="email_exists") toast("呢個email已經註冊咗，試下登入？");
+        else toast("註冊唔到（"+(res.error||"未知錯誤")+"），可以截圖畀開發者睇");
+        return;
+      }
+      state.account = {email:email, anon_id:res.anon_id};
+      persist(); updateAccountUI();
+      toast("註冊成功！");
+      syncProfileToServer();
+    });
+  });
+
+  document.getElementById("acctLoginBtn").addEventListener("click", function(){
+    var email = document.getElementById("acctEmail").value.trim();
+    var password = document.getElementById("acctPassword").value;
+    if(!email || !password){ toast("要打埋email同密碼"); return; }
+    apiCall("login", {email:email, password:password}).then(function(res){
+      if(!res.ok){
+        if(res.error==="wrong_password") toast("密碼錯咗喎");
+        else if(res.error==="not_found") toast("搵唔到呢個email，未註冊？");
+        else toast("登入唔到（"+(res.error||"未知錯誤")+"），可以截圖畀開發者睇");
+        return;
+      }
+      state.account = {email:email, anon_id:res.anon_id};
+      if(res.profile && res.profile.weight){
+        state.profile = res.profile;
+        if(res.macroGoals){
+          state.goal = res.macroGoals.kcal;
+          state.macroGoals = {p:res.macroGoals.p, c:res.macroGoals.c, f:res.macroGoals.f, fib:res.macroGoals.fib};
+        }
+        toast("登入成功，已經幫你還原返個人化目標");
+      }else{
+        toast("登入成功");
+      }
+      persist(); render(); updateAccountUI(); prefillProfileForm();
+    });
+  });
+
+  document.getElementById("acctForgotBtn").addEventListener("click", function(){
+    var f = document.getElementById("acctResetForm");
+    var showing = f.style.display !== "none";
+    if(showing){ f.style.display = "none"; return; }
+    var email = document.getElementById("acctEmail").value.trim();
+    if(!email || email.indexOf("@")===-1){ toast("先喺上面打返你嘅email"); return; }
+    apiCall("requestReset", {email:email}).then(function(res){
+      if(!res.ok){ toast("搵唔到呢個email"); return; }
+      f.style.display = "block";
+      toast("已經send咗封email俾你，入去揾驗證碼");
+    });
+  });
+
+  document.getElementById("acctResetSubmitBtn").addEventListener("click", function(){
+    var email = document.getElementById("acctEmail").value.trim();
+    var token = document.getElementById("acctResetToken").value.trim();
+    var newPassword = document.getElementById("acctNewPassword").value;
+    if(!token || !newPassword || newPassword.length<6){ toast("驗證碼同新密碼（至少6個字）都要打"); return; }
+    apiCall("resetPassword", {email:email, token:token, newPassword:newPassword}).then(function(res){
+      if(!res.ok){
+        if(res.error==="wrong_token") toast("驗證碼錯咗");
+        else if(res.error==="token_expired") toast("驗證碼過咗期，撳返「忘記密碼」再攞多次");
+        else toast("重設唔到，試多次？");
+        return;
+      }
+      toast("密碼已經重設，可以用新密碼登入喇");
+      document.getElementById("acctResetForm").style.display = "none";
+      document.getElementById("acctPassword").value = "";
+      document.getElementById("acctResetToken").value = "";
+      document.getElementById("acctNewPassword").value = "";
+    });
+  });
+
+  document.getElementById("acctLogoutBtn").addEventListener("click", function(){
+    state.account = null;
+    persist(); updateAccountUI();
+    toast("已經登出（本機記錄keep住冇變）");
+  });
+  var resetArmed = false, resetArmTimer = null;
+  var resetBtnEl = document.getElementById("resetDataBtn");
+  resetBtnEl.addEventListener("click", function(){
+    if(!resetArmed){
+      resetArmed = true;
+      resetBtnEl.textContent = "再撳一下確認清空";
+      resetBtnEl.style.background = "var(--chilli)";
+      resetBtnEl.style.color = "#fff";
+      clearTimeout(resetArmTimer);
+      resetArmTimer = setTimeout(function(){
+        resetArmed = false;
+        resetBtnEl.textContent = "清空所有記錄";
+        resetBtnEl.style.background = "";
+        resetBtnEl.style.color = "var(--chilli)";
+      }, 4000);
+      return;
+    }
+    clearTimeout(resetArmTimer);
+    resetArmed = false;
+    resetBtnEl.textContent = "清空所有記錄";
+    resetBtnEl.style.background = "";
+    resetBtnEl.style.color = "var(--chilli)";
+    state.entries = [];
+    state.water = {};
+    persist();
+    render();
+    closeSheet("goal");
+    toast("清空晒喇，乾淨返");
+  });
+
+  // ================= CAPTURE FLOW =================
+  function renderCapture(){
+    var body = document.getElementById("captureBody");
+    if(!sampleFn){
+      body.innerHTML = '<div class="chat-row"><div class="chat-avatar">🤖</div><div class="chat-bubble">呢度嘅AI功能而家用唔到（可能未開到權限），但唔緊要，等你打開權限就用得返喇。</div></div>';
+      return;
+    }
+
+    var html = "";
+    if(imagesOK){
+      html +=
+        '<div class="snap-zone" id="snapZone"><span class="big">📸</span>撳呢度揀相 / 影相<br><span style="font-size:11px;">一張相就得，AI幫你計</span>'+
+        '<input type="file" accept="image/*" capture="environment" id="snapInput"></div>'+
+        '<div style="text-align:center;margin:-4px 0 14px;"><button class="link-btn" id="switchToText">影唔到？打字講俾我聽</button></div>';
+    }else{
+      html += '<div class="chat-row"><div class="chat-avatar">🤖</div><div class="chat-bubble">呢度影相分析暫時未開放，不過唔緊要——打字話俾我知食咗咩，一樣幫你計。</div></div>';
+    }
+    html +=
+      '<div class="text-entry" id="textEntry"'+(imagesOK?' style="display:none;"':'')+'>'+
+        '<textarea id="textFoodInput" rows="2" placeholder="例如：常餐，奶茶走甜"></textarea>'+
+        '<button class="btn-primary" id="textAnalyzeBtn" style="margin-top:10px;">分析</button>'+
+      '</div>';
+    body.innerHTML = html;
+
+    if(imagesOK){
+      document.getElementById("snapInput").addEventListener("change", function(ev){
+        var f = ev.target.files && ev.target.files[0];
+        if(f) runCapture(f);
+      });
+      document.getElementById("switchToText").addEventListener("click", function(){
+        document.getElementById("snapZone").style.display = "none";
+        document.getElementById("switchToText").parentElement.style.display = "none";
+        document.getElementById("textEntry").style.display = "block";
+        document.getElementById("textFoodInput").focus();
+      });
+    }
+    document.getElementById("textAnalyzeBtn").addEventListener("click", function(){
+      var v = document.getElementById("textFoodInput").value.trim();
+      if(!v){ toast("先打幾隻字講你食咗咩"); return; }
+      runCaptureText(v);
+    });
+  }
+
+  async function runCapture(file){
+    var body = document.getElementById("captureBody");
+    var imgUrl = URL.createObjectURL(file);
+    body.innerHTML =
+      '<img class="preview-img" src="'+imgUrl+'">'+
+      '<div class="loading-line"><span class="dot-pulse"></span>AI 睇緊張相...</div>';
+
+    var prompt = "你係一個香港本地飲食記錄App入面嘅AI營養助理，講廣東話口語（書面粵語），語氣親切、識得攞人開玩笑但唔會刻薄或者說教。而家用戶影咗一張食物相。請分析呢張相入面嘅食物，用香港人熟悉嘅講法命名（例如「常餐配奶茶」「車仔麵」「燒味飯」）。留意有啲食物名寫法接近但完全唔同（例如「生豆乳」同「生腐乳」），一定要憑張相真正見到嘅嘢嚟判斷，唔好將佢當做另一件唔同性質嘅食物。如果係一個有牌子、有包裝營養標籤嘅產品（例如樽裝豆漿、包裝飲品、包裝小食），要留意你嘅估算只不過係呢類產品嘅一般水平，未必啱嗰個實際牌子（例如唔同牌子嘅豆漿蛋白質/纖維可以相差好遠），就喺 followUp 度問用戶知唔知包裝上寫嘅實際數字，followUpOptions 淨係俾一個選項「跟返估計」，如果用戶知道實際數字可以用「都唔啱，自己講」嗰個掣打返俾你。如果張相見到係由幾樣分開嘅嘢加埋一齊食（例如飯盒入面有幾樣餸、或者一齊擺埋嘅幾件嘢），將每一樣嘅名放入 items 呢個array；如果本身就係一味完整嘅菜式（例如一碗車仔麵、一份套餐），items 淨係得返一個element就得，等於個food名。如果張相唔清楚見到份量大小或者組合，尤其係一粒粒/一件件計嘅嘢（生果、餅乾、點心呢類）或者飲品，就喺 followUp 度問一句好簡短、好口語嘅問題幫手確認份量或者數量（例如幾多粒、雙併定三併）。followUpOptions 俾2-4個好短選項（每個2-6隻字）：如果係飲品或者樽裝/包裝嘢，選項盡量用具體容量或者重量（例如「250ml」「330ml」「500ml」），唔好用「細杯」「中杯」「大杯」呢類抽象字眼，因為唔同人嘅細中大差好遠；如果係食物就用具體數量或者份量（例如「3粒」「5粒」「半份」）。千祈唔好自己加多一個「自己講」「其他」呢類意思嘅選項，因為個app本身已經有一個固定嘅「都唔啱，自己講」掣俾用戶打字，你淨係專心俾返實際嘅份量選項就得。如果已經好清楚唔需要問，followUp 就係 null，followUpOptions 係空array。無論問唔問，都一定要喺 portionNote 度講清楚你實際計緊幾多份量（例如「10粒中size」「350ml」「一件」），唔可以淨係計數但唔講份量。\n"+
+      "淨係回覆一個JSON object，唔好加任何其他文字，格式：\n"+
+      '{"food": string, "emoji": string, "items": string[], "portionNote": string, "calories": number, "protein": number, "carbs": number, "fat": number, "fiber": number, "comment": string, "followUp": string或null, "followUpOptions": string[]}\n'+
+      "comment 係一句好簡短、有少少幽默感嘅廣東話評語，20字以內，唔好講教。food 10字以內。portionNote 10字以內。fiber 係膳食纖維嘅克數估算。";
+
+    try{
+      var data = await aiAnalyze(prompt, file);
+      showResult(data, file, imgUrl, null);
+    }catch(e){
+      body.innerHTML =
+        '<img class="preview-img" src="'+imgUrl+'">'+
+        '<div class="chat-row"><div class="chat-avatar">🤖</div><div class="chat-bubble">'+errCopy(e.code)+'</div></div>'+
+        '<button class="btn-primary" id="retryBtn">重新分析</button>';
+      var rb = document.getElementById("retryBtn");
+      if(rb) rb.onclick = function(){ runCapture(file); };
+    }
+  }
+
+  async function runCaptureText(text){
+    var body = document.getElementById("captureBody");
+    body.innerHTML =
+      '<div class="chat-row"><div class="chat-avatar">🙋</div><div class="chat-bubble">'+escapeHtml(text)+'</div></div>'+
+      '<div class="loading-line"><span class="dot-pulse"></span>AI 諗緊...</div>';
+
+    var prompt = "你係一個香港本地飲食記錄App入面嘅AI營養助理，講廣東話口語（書面粵語），語氣親切、識得攞人開玩笑但唔會刻薄或者說教。用戶用文字話俾你知佢食咗咩：「"+text+"」。請估算呢個食物嘅營養，用香港人熟悉嘅講法命名（例如「常餐配奶茶」「車仔麵」「燒味飯」）。留意有啲食物名寫法接近但完全唔同（例如「生豆乳」同「生腐乳」），一定要跟返用戶原本打嘅字眼嚟判斷佢講緊咩，唔好將佢當做另一件唔同性質嘅食物；如果真係唔肯定佢講緊邊一樣，要用 followUp 問清楚，唔好自己靜雞雞換咗個名。如果係一個有牌子、有包裝營養標籤嘅產品（例如樽裝豆漿、包裝飲品、包裝小食），要留意你嘅估算只不過係呢類產品嘅一般水平，未必啱嗰個實際牌子（例如唔同牌子嘅豆漿蛋白質/纖維可以相差好遠），就喺 followUp 度問用戶知唔知包裝上寫嘅實際數字，followUpOptions 淨係俾一個選項「跟返估計」，如果用戶知道實際數字可以用「都唔啱，自己講」嗰個掣打返俾你。如果用戶打嘅嘢係由幾樣分開嘅食物加埋一齊食（尤其用戶用「+」「同」「加」「,」或者換行分隔開嗰啲），將每一樣嘅名跟返用戶嘅次序放入 items 呢個array，唔好將佢哋屈埋做一樣；但如果本身就係一個地道嘅完整菜式叫法（例如「魚蛋牛肉米線」「常餐」呢類本身就係一味嘢，唔喺分開幾樣），items 淨係得返一個element就得，等於個food名。如果描述冇講明份量或者數量（例如淨係講咗『提子』『餅乾』『薯片』呢類一粒粒/一件件計嘅嘢，冇講幾多粒、幾多塊；或者飲品冇講幾多ml、成支定半支），一定要用 followUp 問清楚，唔好自己靜雞雞假設；淨係當個食物已經係一個明確嘅單位（例如一個飯盒、一碗麵、一份套餐）先可以唔問。followUpOptions 俾2-4個好短選項（每個2-6隻字）：如果係飲品或者樽裝/包裝嘢，選項一定要用具體容量或者重量（例如「250ml」「330ml」「500ml」），唔好用「細杯」「中杯」「大杯」呢類抽象字眼，因為唔同人嘅細中大差好遠；如果係食物就用具體數量或者份量（例如「3粒」「5粒」「半份」）。千祈唔好自己加多一個「自己講」「其他」呢類意思嘅選項，因為個app本身已經有一個固定嘅「都唔啱，自己講」掣俾用戶打字，你淨係專心俾返實際嘅份量選項就得。如果已經好清楚唔需要問，followUp 就係 null，followUpOptions 係空array。無論問唔問，都一定要喺 portionNote 度講清楚你實際計緊幾多份量（例如「10粒中size」「500ml」「一件」），唔可以淨係計數但唔講份量。\n"+
+      "淨係回覆一個JSON object，唔好加任何其他文字，格式：\n"+
+      '{"food": string, "emoji": string, "items": string[], "portionNote": string, "calories": number, "protein": number, "carbs": number, "fat": number, "fiber": number, "comment": string, "followUp": string或null, "followUpOptions": string[]}\n'+
+      "comment 係一句好簡短、有少少幽默感嘅廣東話評語，20字以內，唔好講教。food 10字以內。portionNote 10字以內。fiber 係膳食纖維嘅克數估算。";
+
+    try{
+      var data = await aiAnalyze(prompt, null);
+      showResult(data, null, null, null);
+    }catch(e){
+      body.innerHTML =
+        '<div class="chat-row"><div class="chat-avatar">🙋</div><div class="chat-bubble">'+escapeHtml(text)+'</div></div>'+
+        '<div class="chat-row"><div class="chat-avatar">🤖</div><div class="chat-bubble">'+errCopy(e.code)+'</div></div>'+
+        '<button class="btn-primary" id="retryTextBtn">重新分析</button>';
+      var rb = document.getElementById("retryTextBtn");
+      if(rb) rb.onclick = function(){ runCaptureText(text); };
+    }
+  }
+
+  function showResult(data, file, imgUrl, refineContext){
+    var body = document.getElementById("captureBody");
+    if(data.followUpOptions && data.followUpOptions.length){
+      data.followUpOptions = data.followUpOptions.filter(function(opt){
+        return opt.indexOf("自己講")===-1 && opt.indexOf("自訂")===-1 && opt.indexOf("其他")===-1;
+      });
+    }
+    var hasFollow = data.followUp && data.followUpOptions && data.followUpOptions.length>0 && !refineContext;
+
+    var html = imgUrl ? '<img class="preview-img" src="'+imgUrl+'">' : "";
+    html += '<div class="chat-row"><div class="chat-avatar">🤖</div><div class="chat-bubble">'+escapeHtml(data.comment||"")+'</div></div>';
+    html += resultCardHtml(data);
+
+    if(hasFollow){
+      html += '<div class="chat-row"><div class="chat-avatar">🤖</div><div class="chat-bubble">'+escapeHtml(data.followUp)+'</div></div>';
+      html += '<div class="chip-row" id="followChips">'+
+        data.followUpOptions.map(function(opt,i){
+          return '<button class="chip" data-opt="'+i+'">'+escapeHtml(opt)+'</button>';
+        }).join("")+
+        '<button class="chip chip-outline" id="chipCustom">都唔啱，自己講</button>'+
+        '</div>'+
+        '<div class="text-entry" id="customAnswerEntry" style="display:none;">'+
+          '<textarea id="customAnswerInput" rows="1" placeholder="例如：500ml、成支飲晒"></textarea>'+
+          '<button class="btn-primary" id="customAnswerBtn" style="margin-top:10px;">確認</button>'+
+        '</div>';
+    }else{
+      html += '<button class="btn-primary" id="confirmAdd">加入今日記錄</button>';
+      html += '<button class="btn-ghost" id="retryFull">'+(imgUrl?'影過另一張':'再嚟一次')+'</button>';
+    }
+    body.innerHTML = html;
+
+    if(hasFollow){
+      body.querySelectorAll("#followChips .chip[data-opt]").forEach(function(btn){
+        btn.addEventListener("click", function(){
+          var chosen = data.followUpOptions[parseInt(btn.getAttribute("data-opt"),10)];
+          refineCapture(data, chosen, file, imgUrl);
+        });
+      });
+      document.getElementById("chipCustom").addEventListener("click", function(){
+        document.getElementById("followChips").style.display = "none";
+        var entry = document.getElementById("customAnswerEntry");
+        entry.style.display = "block";
+        document.getElementById("customAnswerInput").focus();
+      });
+      document.getElementById("customAnswerBtn").addEventListener("click", function(){
+        var v = document.getElementById("customAnswerInput").value.trim();
+        if(!v){ toast("打幾隻字講清楚啲"); return; }
+        refineCapture(data, v, file, imgUrl);
+      });
+    }else{
+      var cb = document.getElementById("confirmAdd");
+      if(cb) cb.onclick = function(){ addEntry(data); closeSheet("capture"); toast("記低咗喇 "+(data.emoji||"🍽️")); };
+      var rb = document.getElementById("retryFull");
+      if(rb) rb.onclick = function(){ renderCapture(); };
+    }
+    var eb = document.getElementById("editFoodBtn");
+    if(eb) eb.onclick = function(){ startEditFoodName(data, file, imgUrl); };
+  }
+
+  function startEditFoodName(data, file, imgUrl){
+    var body = document.getElementById("captureBody");
+    body.innerHTML =
+      (imgUrl ? '<img class="preview-img" src="'+imgUrl+'">' : '')+
+      '<div class="chat-row"><div class="chat-avatar">🤖</div><div class="chat-bubble">啱先講嘅係咩,你話俾我知,我幫你重計</div></div>'+
+      '<div class="edit-food-form">'+
+        '<input type="text" id="editFoodInput" value="'+escapeHtml(data.food||"")+'">'+
+        '<button class="btn-primary" id="editFoodSave">改好重計</button>'+
+        '<button class="btn-ghost" id="editFoodCancel">算啦，返去</button>'+
+      '</div>';
+    document.getElementById("editFoodInput").focus();
+    document.getElementById("editFoodSave").onclick = function(){
+      var corrected = document.getElementById("editFoodInput").value.trim();
+      if(!corrected){ toast("打返個名先"); return; }
+      correctFoodName(data, corrected, file, imgUrl);
+    };
+    document.getElementById("editFoodCancel").onclick = function(){
+      showResult(data, file, imgUrl, {chosen:null});
+    };
+  }
+
+  async function correctFoodName(prevData, corrected, file, imgUrl){
+    var body = document.getElementById("captureBody");
+    body.innerHTML =
+      (imgUrl ? '<img class="preview-img" src="'+imgUrl+'">' : '')+
+      '<div class="loading-line"><span class="dot-pulse"></span>AI 改緊...</div>';
+
+    var prompt = "你之前分析咗一個食物，估計係「"+prevData.food+"」，但用戶而家改正話，呢樣其實係：「"+corrected+"」。請完全跟返用戶呢個講法嚟重新估算營養，唔好再作其他解讀。如果用戶打嘅嘢入面已經包含實際數字（例如包裝營養標籤上寫嘅蛋白質、纖維克數），就直接用返嗰啲數字，唔好自己另外估算。用香港人熟悉嘅講法命名（10字以內，盡量貼近用戶打嘅字眼）。如果係幾樣分開嘅嘢加埋一齊，將每一樣放入 items array；如果係一味嘢，items 就得返一個element。份量唔清楚就自己俾個合理假設，但一定要喺 portionNote 講清楚（10字以內）。\n"+
+      '淨係回覆一個JSON object，唔好加任何其他文字：\n'+
+      '{"food": string, "emoji": string, "items": string[], "portionNote": string, "calories": number, "protein": number, "carbs": number, "fat": number, "fiber": number, "comment": string}\n'+
+      "comment 係一句好簡短、確認改咗嘅廣東話回應，20字以內。";
+
+    try{
+      var data = await aiAnalyze(prompt, null);
+      showResult(data, file, imgUrl, {chosen:corrected});
+    }catch(e){
+      body.innerHTML =
+        (imgUrl ? '<img class="preview-img" src="'+imgUrl+'">' : '')+
+        '<div class="chat-row"><div class="chat-avatar">🤖</div><div class="chat-bubble">'+errCopy(e.code)+'</div></div>'+
+        resultCardHtml(prevData)+
+        '<button class="btn-primary" id="confirmAddFallback">照咁加入記錄</button>';
+      var cb = document.getElementById("confirmAddFallback");
+      if(cb) cb.onclick = function(){ addEntry(prevData); closeSheet("capture"); toast("記低咗喇"); };
+    }
+  }
+
+  function resultCardHtml(data){
+    return '<div class="result-card">'+
+      '<div class="result-head"><span class="emo">'+(data.emoji||"🍽️")+'</span>'+
+      '<div style="flex:1;min-width:0;"><span class="name">'+escapeHtml(data.food||"未知食物")+'</span>'+
+      '<span class="edit-pencil-inline" id="editFoodBtn">✏️改</span>'+
+      (data.items && data.items.length>1 ? '<div class="items-chips">'+data.items.map(function(it){return '<span>'+escapeHtml(it)+'</span>';}).join("")+'</div>' : '')+
+      (data.portionNote ? '<div class="portion-note">份量假設：'+escapeHtml(data.portionNote)+'</div>' : '')+
+      '</div>'+
+      '<span class="kcal">'+Math.round(data.calories||0)+' 千卡</span></div>'+
+      '<div class="result-macros">'+
+        '<div class="m"><div class="v">'+Math.round(data.protein||0)+'g</div><div class="l">蛋白質</div></div>'+
+        '<div class="m"><div class="v">'+Math.round(data.carbs||0)+'g</div><div class="l">碳水</div></div>'+
+        '<div class="m"><div class="v">'+Math.round(data.fat||0)+'g</div><div class="l">脂肪</div></div>'+
+      '</div>'+
+      '<div class="fiber-note">纖維 '+Math.round(data.fiber||0)+'g</div>'+
+      '</div>';
+  }
+
+  async function refineCapture(prevData, chosen, file, imgUrl){
+    var body = document.getElementById("captureBody");
+    body.innerHTML =
+      (imgUrl ? '<img class="preview-img" src="'+imgUrl+'">' : '')+
+      '<div class="chat-row"><div class="chat-avatar">🙋</div><div class="chat-bubble">'+escapeHtml(chosen)+'</div></div>'+
+      '<div class="loading-line"><span class="dot-pulse"></span>AI 執緊個估算...</div>';
+
+    var prompt = "你之前分析咗一個食物，初步結果係：「"+prevData.food+"」，大約 "+Math.round(prevData.calories)+" 千卡，蛋白質 "+Math.round(prevData.protein)+"g，碳水 "+Math.round(prevData.carbs)+"g，脂肪 "+Math.round(prevData.fat)+"g。你問咗用戶：「"+prevData.followUp+"」，用戶答：「"+chosen+"」。請根據呢個答案調整返個營養估算，令佢更準確（例如大份就加多啲，細份/走底就減少，講咗幾多粒就跟返嗰個數量計）。如果用戶個答案入面已經包含實際數字（例如佢讀緊包裝營養標籤講出蛋白質/纖維/卡路里實際克數），一定要直接用返用戶提供嘅數字，唔好自己再另外估算或者打折扣。"+(prevData.items && prevData.items.length>1 ? "原本呢餐係由呢幾樣組成：「"+prevData.items.join("、")+"」，保持返呢個拆法。" : "")+"\n"+
+      '淨係回覆一個JSON object，唔好加任何其他文字：\n'+
+      '{"food": string, "emoji": string, "items": string[], "portionNote": string, "calories": number, "protein": number, "carbs": number, "fat": number, "fiber": number, "comment": string}\n'+
+      "comment 係一句好簡短、確認調整咗嘅廣東話回應，帶少少幽默感，20字以內。portionNote 講清楚而家實際計緊嘅份量（例如「15粒」「大碗」），10字以內。fiber 都要跟住份量重新估算。";
+
+    try{
+      var refined = await aiAnalyze(prompt, null);
+      showResult(refined, file, imgUrl, {chosen:chosen});
+    }catch(e){
+      body.innerHTML =
+        (imgUrl ? '<img class="preview-img" src="'+imgUrl+'">' : '')+
+        '<div class="chat-row"><div class="chat-avatar">🤖</div><div class="chat-bubble">'+errCopy(e.code)+'</div></div>'+
+        resultCardHtml(prevData)+
+        '<button class="btn-primary" id="confirmAddFallback">照咁加入記錄</button>';
+      var cb = document.getElementById("confirmAddFallback");
+      if(cb) cb.onclick = function(){ addEntry(prevData); closeSheet("capture"); toast("記低咗喇"); };
+    }
+  }
+
+  function addEntry(data){
+    state.entries.push({
+      id: "e"+Date.now()+Math.random().toString(36).slice(2,7),
+      ts: new Date().toISOString(),
+      food: data.food || "食物",
+      emoji: data.emoji || "🍽️",
+      portionNote: data.portionNote || "",
+      calories: Number(data.calories)||0,
+      protein: Number(data.protein)||0,
+      carbs: Number(data.carbs)||0,
+      fat: Number(data.fat)||0,
+      fiber: Number(data.fiber)||0,
+      comment: data.comment || ""
+    });
+    persist();
+    render();
+  }
+
+  // ================= CATCH-UP FLOW =================
+  var catchupItems = []; // {file, imgUrl, text, status:'pending'|'done'|'error', data, on:true}
+
+  function renderCatchup(){
+    catchupItems = [];
+    var body = document.getElementById("catchupBody");
+    if(!sampleFn){
+      body.innerHTML = '<div class="chat-row"><div class="chat-avatar">🤖</div><div class="chat-bubble">呢度嘅AI功能而家用唔到，遲啲再試下啦。</div></div>';
+      return;
+    }
+    if(!imagesOK){
+      body.innerHTML =
+        '<div class="chat-row"><div class="chat-avatar">🤖</div><div class="chat-bubble">影相批量分析呢度暫時未開放，不過打字一樣得——一行寫一樣，AI幫你逐樣計。</div></div>'+
+        '<div class="text-entry">'+
+          '<textarea id="catchTextInput" rows="4" placeholder="一行一樣，例如：\n常餐奶茶\n下午茶蛋撻\n晚飯魚蛋粉"></textarea>'+
+          '<button class="btn-primary" id="catchTextBtn" style="margin-top:10px;">分析全部</button>'+
+        '</div>'+
+        '<div id="catchList"></div>'+
+        '<button class="btn-primary" id="addAllBtn" style="display:none;margin-top:10px;">加晒落記錄</button>';
+      document.getElementById("catchTextBtn").addEventListener("click", function(){
+        var btn = document.getElementById("catchTextBtn");
+        var lines = document.getElementById("catchTextInput").value.split("\n")
+          .map(function(s){ return s.trim(); }).filter(Boolean).slice(0,9);
+        if(!lines.length){ toast("打返啲嘢先啦"); return; }
+        btn.disabled = true;
+        startCatchupText(lines);
+      });
+      return;
+    }
+    body.innerHTML =
+      '<div class="snap-zone" id="catchZone"><span class="big">🗂️</span>一次過揀返幾張漏低嘅食物相<br><span style="font-size:11px;">最多一次揀9張</span>'+
+      '<input type="file" accept="image/*" multiple id="catchInput"></div>'+
+      '<div id="catchList"></div>'+
+      '<button class="btn-primary" id="addAllBtn" style="display:none;">加晒落記錄</button>';
+    document.getElementById("catchInput").addEventListener("change", function(ev){
+      var files = Array.prototype.slice.call(ev.target.files||[]).slice(0,9);
+      if(files.length) startCatchup(files);
+    });
+  }
+
+  function startCatchup(files){
+    document.getElementById("catchZone").style.display = "none";
+    catchupItems = files.map(function(f){
+      return { file:f, imgUrl:URL.createObjectURL(f), text:null, status:"pending", data:null, on:true };
+    });
+    renderCatchList();
+    processCatchupQueue(0);
+  }
+
+  function startCatchupText(lines){
+    catchupItems = lines.map(function(t){
+      return { file:null, imgUrl:null, text:t, status:"pending", data:null, on:true };
+    });
+    renderCatchList();
+    processCatchupQueue(0);
+  }
+
+  function renderCatchList(){
+    var listEl = document.getElementById("catchList");
+    listEl.innerHTML = catchupItems.map(function(item, i){
+      var thumbDone = item.imgUrl ? '<img src="'+item.imgUrl+'">' : '<div class="catch-emo">'+((item.data&&item.data.emoji)||"🍽️")+'</div>';
+      var thumbPending = item.imgUrl ? '<img src="'+item.imgUrl+'">' : '<div class="catch-emo">📝</div>';
+      if(item.status==="pending"){
+        return '<div class="catch-item pending">'+thumbPending+
+          '<div class="mid"><div class="n">分析緊...</div><div class="k">'+(item.text?escapeHtml(item.text):"請等一等")+'</div></div>'+
+          '<div class="toggle"></div></div>';
+      }else if(item.status==="error"){
+        return '<div class="catch-item pending">'+thumbPending+
+          '<div class="mid"><div class="n">呢項分析唔到</div><div class="k">會自動跳過</div></div>'+
+          '<div class="toggle"></div></div>';
+      }else if(item.editing){
+        return '<div class="catch-item editing">'+thumbDone+
+          '<div class="catch-edit-row">'+
+            '<input type="text" id="catchEditInput'+i+'" value="'+escapeHtml(item.data.food)+'">'+
+            '<div class="catch-edit-btns">'+
+              '<button class="catch-edit-save" data-saveidx="'+i+'">改好重計</button>'+
+              '<button class="catch-edit-cancel" data-cancelidx="'+i+'">算啦</button>'+
+            '</div>'+
+          '</div></div>';
+      }else{
+        return '<div class="catch-item '+(item.on?"on":"")+'" data-idx="'+i+'">'+thumbDone+
+          '<div class="mid"><div class="n">'+(item.data.emoji||"🍽️")+' '+escapeHtml(item.data.food)+' <span class="edit-pencil" data-editidx="'+i+'">✏️改</span></div>'+
+          '<div class="k">'+Math.round(item.data.calories)+' 千卡'+(item.data.portionNote?' · '+escapeHtml(item.data.portionNote):'')+'</div></div>'+
+          '<div class="toggle">✓</div></div>';
+      }
+    }).join("");
+    listEl.querySelectorAll(".catch-item[data-idx]").forEach(function(el){
+      el.addEventListener("click", function(ev){
+        if(ev.target && ev.target.classList.contains("edit-pencil")) return;
+        var idx = parseInt(el.getAttribute("data-idx"),10);
+        catchupItems[idx].on = !catchupItems[idx].on;
+        renderCatchList();
+      });
+    });
+    listEl.querySelectorAll(".edit-pencil").forEach(function(el){
+      el.addEventListener("click", function(ev){
+        ev.stopPropagation();
+        var idx = parseInt(el.getAttribute("data-editidx"),10);
+        catchupItems[idx].editing = true;
+        renderCatchList();
+      });
+    });
+    listEl.querySelectorAll(".catch-edit-save").forEach(function(el){
+      el.addEventListener("click", function(ev){
+        ev.stopPropagation();
+        var idx = parseInt(el.getAttribute("data-saveidx"),10);
+        var input = document.getElementById("catchEditInput"+idx);
+        var corrected = input.value.trim();
+        if(!corrected){ toast("打返個名先"); return; }
+        catchupItems[idx].editing = false;
+        reanalyzeCatchItem(idx, corrected);
+      });
+    });
+    listEl.querySelectorAll(".catch-edit-cancel").forEach(function(el){
+      el.addEventListener("click", function(ev){
+        ev.stopPropagation();
+        var idx = parseInt(el.getAttribute("data-cancelidx"),10);
+        catchupItems[idx].editing = false;
+        renderCatchList();
+      });
+    });
+    var anyDone = catchupItems.some(function(it){ return it.status==="done"; });
+    document.getElementById("addAllBtn").style.display = anyDone ? "block" : "none";
+  }
+
+  async function processCatchupQueue(i){
+    if(i>=catchupItems.length) return;
+    var item = catchupItems[i];
+    var prompt, file;
+    if(item.file){
+      prompt = "你係一個香港本地飲食記錄App嘅AI營養助理，講廣東話口語。分析呢張食物相，用香港人熟悉嘅講法命名（10字以內）。留意有啲食物名寫法接近但完全唔同（例如「生豆乳」同「生腐乳」），一定要憑張相真正見到嘅嘢嚟判斷，唔好將佢當做另一件唔同性質嘅食物。呢度係批量補記，唔可以問問題，如果份量唔清楚就自己俾個合理假設，但一定要喺 portionNote 講清楚假設緊幾多（例如「10粒中size」「一碗細」），10字以內。淨係回覆一個JSON object，唔好加其他文字：\n"+
+        '{"food": string, "emoji": string, "portionNote": string, "calories": number, "protein": number, "carbs": number, "fat": number, "fiber": number}';
+      file = item.file;
+    }else{
+      prompt = "你係一個香港本地飲食記錄App嘅AI營養助理，講廣東話口語。用戶話佢食咗：「"+item.text+"」。估算呢個食物嘅營養，用香港人熟悉嘅講法命名（10字以內）。留意有啲食物名寫法接近但完全唔同（例如「生豆乳」同「生腐乳」），一定要跟返用戶原本打嘅字眼嚟判斷佢講緊咩，唔好將佢當做另一件唔同性質嘅食物。呢度係批量補記，唔可以問問題，如果份量唔清楚就自己俾個合理假設，但一定要喺 portionNote 講清楚假設緊幾多（例如「10粒中size」「一碗細」），10字以內。淨係回覆一個JSON object，唔好加其他文字：\n"+
+        '{"food": string, "emoji": string, "portionNote": string, "calories": number, "protein": number, "carbs": number, "fat": number, "fiber": number}';
+      file = null;
+    }
+    try{
+      var data = await aiAnalyze(prompt, file);
+      item.status = "done"; item.data = data;
+    }catch(e){
+      item.status = "error";
+    }
+    renderCatchList();
+    processCatchupQueue(i+1);
+  }
+
+  async function reanalyzeCatchItem(idx, correctedName){
+    var item = catchupItems[idx];
+    item.status = "pending";
+    renderCatchList();
+    var prompt = "你係一個香港本地飲食記錄App嘅AI營養助理，講廣東話口語。用戶之前試過記錄一樣食物，但AI認錯咗，用戶而家改正話呢樣其實係：「"+correctedName+"」。請完全跟返用戶呢個講法嚟估算營養，唔好再作其他解讀，用香港人熟悉嘅講法命名（10字以內，盡量貼近用戶打嘅字眼）。份量唔清楚就自己俾個合理假設，但一定要喺 portionNote 講清楚（10字以內）。淨係回覆一個JSON object，唔好加其他文字：\n"+
+      '{"food": string, "emoji": string, "portionNote": string, "calories": number, "protein": number, "carbs": number, "fat": number, "fiber": number}';
+    try{
+      var data = await aiAnalyze(prompt, null);
+      item.status = "done"; item.data = data;
+    }catch(e){
+      item.status = "error";
+    }
+    renderCatchList();
+  }
+
+  document.addEventListener("click", function(ev){
+    if(ev.target && ev.target.id==="addAllBtn"){
+      var added = 0;
+      catchupItems.forEach(function(item){
+        if(item.status==="done" && item.on){ addEntry(item.data); added++; }
+      });
+      closeSheet("catchup");
+      if(added>0) toast("幫你加咗 "+added+" 項落記錄，追返晒喇！");
+    }
+  });
+
+  // ---------- water ----------
+  document.getElementById("waterBtn").addEventListener("click", function(){
+    var k = todayKey();
+    state.water[k] = (state.water[k]||0) + 1;
+    persist(); render();
+  });
+
+  // ---------- boot ----------
+  render();
+  initClaude();
+})();
+</script>
+</body>
+</html>
