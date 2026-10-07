@@ -604,7 +604,7 @@
     return new Promise(function(resolve){
       var xhr = new XMLHttpRequest();
       xhr.open("POST", API_URL, true);
-      xhr.timeout = 45000;
+      xhr.timeout = 90000;
       xhr.onload = function(){
         if(xhr.status < 200 || xhr.status >= 300){
           resolve({ok:false, error:"http_"+xhr.status});
@@ -729,11 +729,12 @@
       case "missing_api_key": return "not_granted";
       case "invalid_json": return "invalid_json";
       case "missing_content": return "invalid_json";
-      case "timeout": return "upstream_error";
-      case "network_error": return "upstream_error";
-      case "parse_error": return "invalid_json";
+      case "timeout": return "timeout";
+      case "network_error": return "network_error";
+      case "parse_error": return "bad_response";
       default:
         if(String(err).indexOf("api_error_429")===0) return "rate_limited";
+        if(String(err).indexOf("http_")===0) return "server_error";
         return "upstream_error";
     }
   }
@@ -764,7 +765,11 @@
       rate_limited: "太密call喇，等一陣先再試。",
       refused: "AI答唔到呢個，換個角度再試下。",
       invalid_json: "AI答得有啲亂，撳「重新分析」再試一次。",
-      upstream_error: "連線唔穩定，撳「重新分析」再試一次。",
+      timeout: "AI 分析用咗太長時間（超時），撳「重新分析」再試一次。",
+      network_error: "連唔到伺服器，請檢查網絡後再試。",
+      bad_response: "伺服器回應異常（唔係預期格式），撳「重新分析」再試一次。",
+      server_error: "伺服器暫時出錯，等一陣再試。",
+      upstream_error: "AI 服務暫時有問題，撳「重新分析」再試一次。",
       cancelled: ""
     };
     return map[code] || "出咗少少問題，再試一次啦。";
