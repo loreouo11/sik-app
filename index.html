@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="color-scheme" content="dark">
-<title>食定未 — 唔使記得，影咗先算</title>
+<meta name="color-scheme" content="light">
+<title>食咗未 Ate Yet? — 唔使記得，影咗先算</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@700;900&family=Noto+Sans+TC:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -13,24 +13,27 @@
     box-sizing:border-box;
     padding-top:env(safe-area-inset-top,0px);
     padding-bottom:env(safe-area-inset-bottom,0px);
-    --ink:#12201B;
-    --surface:#1B2A23;
-    --surface2:#23362C;
-    --surface3:#2C4234;
-    --line: rgba(245,239,224,0.14);
-    --mango:#F2B705;
-    --mango-deep:#C98F02;
-    --chilli:#E8543D;
-    --leaf:#6FBE8B;
-    --cream:#F5EFE0;
-    --muted:#9FB0A2;
-    --shadow: 0 18px 40px rgba(0,0,0,.45);
+    --ink:#EDE6D3;
+    --ink-deep:#E0D6BC;
+    --surface:#FBF8EF;
+    --surface2:#E4DAC0;
+    --surface3:#D6CAA9;
+    --line: rgba(58,42,20,0.22);
+    --mango:#2E7A5C;
+    --mango-deep:#1D5A40;
+    --chilli:#D0472A;
+    --chilli-deep:#9E2E17;
+    --wood:#8B5A34;
+    --leaf:#7FAE8B;
+    --cream:#332B22;
+    --muted:#7A6F58;
+    --shadow: 0 18px 40px rgba(40,32,16,.28);
   }
   *{box-sizing:border-box;}
   html,body{height:100%;margin:0;}
   html{scroll-padding-top:env(safe-area-inset-top,0px);}
   body{
-    background:#0B120F;
+    background:#E7DEC4;
     color:var(--cream);
     font-family:"Noto Sans TC","Noto Sans CJK TC",sans-serif;
     -webkit-font-smoothing:antialiased;
@@ -44,9 +47,9 @@
     content:"";
     position:fixed; inset:0;
     background:
-      radial-gradient(60% 50% at 50% 0%, rgba(242,183,5,0.10), transparent 60%),
-      radial-gradient(80% 60% at 50% 100%, rgba(111,190,139,0.08), transparent 60%),
-      #0B120F;
+      radial-gradient(60% 50% at 50% 0%, rgba(46,122,92,0.10), transparent 60%),
+      radial-gradient(80% 60% at 50% 100%, rgba(139,90,52,0.08), transparent 60%),
+      #E7DEC4;
     z-index:0;
   }
 
@@ -63,20 +66,32 @@
       margin:28px auto 40px;
       border-radius:40px;
       overflow:hidden;
-      box-shadow:var(--shadow), 0 0 0 9px #05100B, 0 0 0 10px rgba(245,239,224,0.08);
+      box-shadow:var(--shadow), 0 0 0 9px #F3ECD9, 0 0 0 10px rgba(58,42,20,0.12);
       min-height:860px;
     }
   }
 
   .app{
     position:relative;
-    background:linear-gradient(180deg, var(--ink), #0F1B16 70%);
+    background:linear-gradient(180deg, var(--ink), var(--ink-deep) 70%);
     min-height:100%;
     padding-top:calc(env(safe-area-inset-top,0px) + 18px);
     padding-bottom:calc(env(safe-area-inset-bottom,0px) + 110px);
     padding-left:20px;
     padding-right:20px;
   }
+  .app::before{
+    content:""; position:absolute; inset:0; pointer-events:none;
+    background-image:
+      radial-gradient(circle at 15% 25%, rgba(46,122,92,.4) 0 1.6px, transparent 2.6px),
+      radial-gradient(circle at 70% 60%, rgba(139,90,52,.35) 0 1.4px, transparent 2.4px),
+      radial-gradient(circle at 40% 80%, rgba(208,71,42,.3) 0 1.4px, transparent 2.4px),
+      radial-gradient(circle at 85% 15%, rgba(46,122,92,.3) 0 1.3px, transparent 2.3px),
+      radial-gradient(circle at 10% 70%, rgba(139,90,52,.3) 0 1.3px, transparent 2.3px);
+    background-size: 110px 110px;
+    background-color: var(--ink);
+  }
+  .app > *{position:relative;}
 
   h1,h2,h3{font-family:"Noto Serif TC",serif; font-weight:900; margin:0; color:var(--cream);}
   p{margin:0;}
@@ -85,13 +100,23 @@
   /* ---------- header ---------- */
   .topbar{display:flex; align-items:center; justify-content:space-between; margin-bottom:18px;}
   .brand{display:flex; align-items:baseline; gap:8px;}
+  .brand-chip{
+    display:inline-flex; align-items:center;
+    background:var(--surface); border:1px solid var(--line);
+    border-radius:14px; padding:7px 14px 7px 12px;
+    box-shadow:0 2px 6px rgba(40,32,16,.12);
+  }
   .brand .wordmark{font-family:"Noto Serif TC",serif; font-weight:900; font-size:22px; letter-spacing:.5px;}
   .brand .wordmark em{font-style:normal; color:var(--mango);}
   .date-line{font-size:11.5px; color:var(--muted); margin-top:2px;}
   .streak-pill{
     display:flex; align-items:center; gap:5px;
-    background:var(--surface2); border:1px solid var(--line);
+    background:rgba(255,255,255,0.38);
+    border:1px solid rgba(255,255,255,0.55);
+    backdrop-filter:blur(10px) saturate(160%);
+    -webkit-backdrop-filter:blur(10px) saturate(160%);
     padding:7px 12px; border-radius:999px; font-size:13px; font-weight:700;
+    box-shadow:0 4px 14px rgba(40,32,16,.10), inset 0 1px 0 rgba(255,255,255,.55);
   }
   .streak-pill .flame{filter:saturate(1.3);}
 
@@ -100,7 +125,7 @@
     background:var(--surface);
     border:1px solid var(--line);
     border-radius:26px;
-    padding:20px 18px 18px;
+    padding:34px 18px 18px;
     display:flex;
     gap:16px;
     align-items:center;
@@ -121,7 +146,7 @@
   .macro-row .bar > span{display:block; height:100%; border-radius:4px;}
   .macro-row .val{width:56px; text-align:right; color:var(--muted); font-variant-numeric:tabular-nums;}
   .goal-edit{
-    position:absolute; top:14px; right:14px;
+    position:absolute; top:8px; right:12px;
     background:none; border:none; color:var(--muted);
     font-size:11px; text-decoration:underline; text-underline-offset:2px;
     padding:4px;
@@ -139,23 +164,28 @@
   .water-left .txt .t2{font-size:11px; color:var(--muted); margin-top:1px;}
   .water-btn{
     width:34px; height:34px; border-radius:50%;
-    background:var(--surface3); border:1px solid var(--line); color:var(--cream);
-    font-size:17px; display:flex; align-items:center; justify-content:center;
+    background:rgba(255,255,255,0.55);
+    border:1px solid rgba(255,255,255,0.7);
+    backdrop-filter:blur(8px) saturate(160%);
+    -webkit-backdrop-filter:blur(8px) saturate(160%);
+    color:var(--mango-deep);
+    font-size:17px; font-weight:800; display:flex; align-items:center; justify-content:center;
+    box-shadow:0 4px 10px rgba(40,32,16,.12), inset 0 1px 0 rgba(255,255,255,.6);
   }
   .water-btn:active{transform:scale(0.92);}
 
   /* ---------- nudge ---------- */
   .nudge{
     display:flex; align-items:center; gap:12px;
-    background:linear-gradient(135deg, rgba(232,84,61,.16), rgba(242,183,5,.10));
-    border:1px solid rgba(242,183,5,.35);
+    background:linear-gradient(135deg, rgba(46,122,92,.12), rgba(139,90,52,.10));
+    border:1px solid rgba(46,122,92,.3);
     border-radius:20px; padding:13px 15px; margin-bottom:20px;
   }
   .nudge .ico{font-size:22px;}
   .nudge .txt{flex:1; font-size:12.5px; line-height:1.5;}
   .nudge .txt b{display:block; font-size:13.5px; margin-bottom:1px;}
   .nudge button{
-    background:var(--mango); color:#1B1400; border:none; border-radius:999px;
+    background:var(--mango); color:#FFF6EC; border:none; border-radius:999px;
     padding:8px 13px; font-weight:700; font-size:12px; white-space:nowrap;
   }
 
@@ -167,7 +197,7 @@
   /* ---------- log ticket ---------- */
   .ticket{
     background:var(--surface);
-    border:1px dashed var(--line);
+    border:1.5px dashed var(--wood);
     border-radius:16px;
     padding:13px 14px;
     margin-bottom:10px;
@@ -178,7 +208,7 @@
   .ticket .mid{flex:1; min-width:0;}
   .ticket .mid .name{font-weight:700; font-size:13.5px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
   .ticket .mid .meta{font-size:11px; color:var(--muted); margin-top:2px; letter-spacing:.3px;}
-  .ticket .kcal{font-family:"Noto Serif TC",serif; font-weight:900; font-size:15px; color:var(--mango); white-space:nowrap;}
+  .ticket .kcal{font-family:"Noto Serif TC",serif; font-weight:900; font-size:15px; color:var(--chilli); white-space:nowrap;}
   .empty-log{
     text-align:center; padding:30px 10px; color:var(--muted); font-size:12.5px; line-height:1.7;
   }
@@ -204,10 +234,10 @@
   .fab{
     pointer-events:auto;
     width:70px; height:70px; border-radius:50%;
-    background:radial-gradient(circle at 32% 28%, #FFDD6B, var(--mango) 60%, var(--mango-deep) 100%);
-    border:none; color:#1B1400; font-size:28px;
+    background:radial-gradient(circle at 32% 28%, #F0765A, var(--chilli) 60%, var(--chilli-deep) 100%);
+    border:none; color:#FFF6EC; font-size:28px;
     display:flex; align-items:center; justify-content:center;
-    box-shadow:0 12px 26px rgba(242,183,5,.4);
+    box-shadow:0 12px 26px rgba(208,71,42,.4);
     margin-top:-16px;
   }
   .fab:active{transform:scale(0.95);}
@@ -288,7 +318,7 @@
     background:var(--surface3); border:1px solid var(--line); border-radius:8px;
     font-size:10.5px; color:var(--cream); padding:2px 7px;
   }
-  .result-head .kcal{font-family:"Noto Serif TC",serif; font-weight:900; font-size:17px; color:var(--mango); white-space:nowrap; padding-top:2px;}
+  .result-head .kcal{font-family:"Noto Serif TC",serif; font-weight:900; font-size:17px; color:var(--chilli); white-space:nowrap; padding-top:2px;}
   .portion-note{font-size:11px; color:var(--muted); margin-top:2px;}
   .result-macros{display:flex; gap:8px;}
   .result-macros .m{
@@ -309,7 +339,7 @@
   @keyframes pulse{0%,100%{opacity:.25} 50%{opacity:1}}
 
   .btn-primary{
-    width:100%; background:var(--mango); color:#1B1400; border:none;
+    width:100%; background:var(--mango); color:#FFF6EC; border:none;
     padding:14px; border-radius:16px; font-weight:700; font-size:14.5px;
   }
   .btn-primary:active{transform:scale(0.98);}
@@ -349,7 +379,7 @@
   .catch-edit-row .catch-edit-btns button{
     flex:1; padding:7px; border-radius:10px; font-size:11.5px; font-weight:700; border:none; font-family:inherit;
   }
-  .catch-edit-row .catch-edit-save{background:var(--mango); color:#2B1D02;}
+  .catch-edit-row .catch-edit-save{background:var(--mango); color:#FFF6EC;}
   .catch-edit-row .catch-edit-cancel{background:var(--surface2); color:var(--muted);}
 
   .goal-form label{font-size:12px; color:var(--muted); display:block; margin-bottom:6px;}
@@ -385,7 +415,7 @@
   .toast.show{opacity:1; transform:translateX(-50%) translateY(0);}
 
   .visually-hidden{position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0,0,0,0);}
-  ::selection{background:var(--mango); color:#1B1400;}
+  ::selection{background:var(--mango); color:#FFF6EC;}
 </style>
 </head>
 <body>
@@ -395,9 +425,11 @@
 
     <div class="topbar">
       <div class="brand">
-        <div>
-          <div class="wordmark">食定<em>未</em></div>
-          <div class="date-line" id="dateLine"></div>
+        <div class="brand-chip">
+          <div>
+            <div class="wordmark">食咗<em>未</em></div>
+            <div class="date-line" id="dateLine"></div>
+          </div>
         </div>
       </div>
       <div class="streak-pill"><span class="flame">🔥</span><span id="streakNum">0</span> 日</div>
@@ -407,8 +439,8 @@
       <button class="goal-edit" id="goalEditBtn">改目標</button>
       <div class="ring-wrap">
         <svg width="104" height="104" viewBox="0 0 104 104">
-          <circle cx="52" cy="52" r="45" fill="none" stroke="#2C4234" stroke-width="10"/>
-          <circle id="ringProgress" cx="52" cy="52" r="45" fill="none" stroke="#F2B705" stroke-width="10"
+          <circle cx="52" cy="52" r="45" fill="none" stroke="#D6CAA9" stroke-width="10"/>
+          <circle id="ringProgress" cx="52" cy="52" r="45" fill="none" stroke="#2E7A5C" stroke-width="10"
                   stroke-linecap="round" stroke-dasharray="283" stroke-dashoffset="283"/>
         </svg>
         <div class="ring-center">
@@ -417,10 +449,10 @@
         </div>
       </div>
       <div class="macros">
-        <div class="macro-row"><span class="label">蛋白</span><div class="bar"><span id="barP" style="width:0%;background:#6FBE8B"></span></div><span class="val" id="valP">0/90g</span></div>
-        <div class="macro-row"><span class="label">碳水</span><div class="bar"><span id="barC" style="width:0%;background:#F2B705"></span></div><span class="val" id="valC">0/200g</span></div>
-        <div class="macro-row"><span class="label">脂肪</span><div class="bar"><span id="barF" style="width:0%;background:#E8543D"></span></div><span class="val" id="valF">0/60g</span></div>
-        <div class="macro-row"><span class="label">纖維</span><div class="bar"><span id="barFib" style="width:0%;background:#8FBF6F"></span></div><span class="val" id="valFib">0/25g</span></div>
+        <div class="macro-row"><span class="label">蛋白</span><div class="bar"><span id="barP" style="width:0%;background:#2E7A5C"></span></div><span class="val" id="valP">0/90g</span></div>
+        <div class="macro-row"><span class="label">碳水</span><div class="bar"><span id="barC" style="width:0%;background:#C6963D"></span></div><span class="val" id="valC">0/200g</span></div>
+        <div class="macro-row"><span class="label">脂肪</span><div class="bar"><span id="barF" style="width:0%;background:#B5583F"></span></div><span class="val" id="valF">0/60g</span></div>
+        <div class="macro-row"><span class="label">纖維</span><div class="bar"><span id="barFib" style="width:0%;background:#7FAE8B"></span></div><span class="val" id="valFib">0/25g</span></div>
       </div>
     </div>
 
@@ -507,7 +539,7 @@
         <button class="btn-primary" id="pfCalcBtn">自動幫我計</button>
         <div id="pfResult" style="display:none;margin-top:14px;background:var(--surface2);border:1px solid var(--line);border-radius:12px;padding:12px 14px;">
           <div style="font-size:12.5px;color:var(--muted);margin-bottom:8px;">計出嚟嘅每日目標：</div>
-          <div style="font-family:'Noto Serif TC',serif;font-weight:900;font-size:22px;color:var(--mango);" id="pfKcalOut">0 千卡</div>
+          <div style="font-family:'Noto Serif TC',serif;font-weight:900;font-size:22px;color:var(--chilli);" id="pfKcalOut">0 千卡</div>
           <div style="display:flex;gap:8px;margin-top:10px;">
             <div style="flex:1;text-align:center;"><div style="font-weight:700;font-size:13px;" id="pfPOut">0g</div><div style="font-size:9.5px;color:var(--muted);">蛋白質</div></div>
             <div style="flex:1;text-align:center;"><div style="font-weight:700;font-size:13px;" id="pfCOut">0g</div><div style="font-size:9.5px;color:var(--muted);">碳水</div></div>
@@ -572,7 +604,7 @@
     return new Promise(function(resolve){
       var xhr = new XMLHttpRequest();
       xhr.open("POST", API_URL, true);
-      xhr.timeout = 15000;
+      xhr.timeout = 45000;
       xhr.onload = function(){
         if(xhr.status < 200 || xhr.status >= 300){
           resolve({ok:false, error:"http_"+xhr.status});
@@ -662,6 +694,36 @@
     });
   }
 
+  // 手機影嘅相通常有幾MB，傳去後台前先縮細+壓縮，等上載快啲、穩陣啲
+  function compressImageFile(file, maxDim, quality){
+    maxDim = maxDim || 1024;
+    quality = quality || 0.75;
+    return new Promise(function(resolve){
+      var img = new Image();
+      var url = URL.createObjectURL(file);
+      img.onload = function(){
+        var w = img.width, h = img.height;
+        if(w > maxDim || h > maxDim){
+          if(w >= h){ h = Math.round(h * maxDim / w); w = maxDim; }
+          else{ w = Math.round(w * maxDim / h); h = maxDim; }
+        }
+        var canvas = document.createElement("canvas");
+        canvas.width = w; canvas.height = h;
+        var ctx = canvas.getContext("2d");
+        ctx.drawImage(img, 0, 0, w, h);
+        URL.revokeObjectURL(url);
+        canvas.toBlob(function(blob){
+          resolve(blob || file); // 壓縮失敗就用返原檔案，好過整個功能死咗
+        }, "image/jpeg", quality);
+      };
+      img.onerror = function(){
+        URL.revokeObjectURL(url);
+        resolve(file); // 讀唔到就用返原檔案
+      };
+      img.src = url;
+    });
+  }
+
   function mapAiErrorCode(err){
     switch(err){
       case "missing_api_key": return "not_granted";
@@ -680,8 +742,9 @@
   async function aiAnalyze(prompt, file){
     var imageBase64 = null, imageMediaType = null;
     if(file){
-      imageBase64 = await fileToBase64(file);
-      imageMediaType = file.type || "image/jpeg";
+      var compressed = await compressImageFile(file);
+      imageBase64 = await fileToBase64(compressed);
+      imageMediaType = "image/jpeg";
     }
     var res = await apiCall("analyzeFood", { prompt: prompt, imageBase64: imageBase64, imageMediaType: imageMediaType });
     if(!res.ok){
@@ -1045,7 +1108,7 @@
     if(imagesOK){
       html +=
         '<div class="snap-zone" id="snapZone"><span class="big">📸</span>撳呢度揀相 / 影相<br><span style="font-size:11px;">一張相就得，AI幫你計</span>'+
-        '<input type="file" accept="image/*" capture="environment" id="snapInput"></div>'+
+        '<input type="file" accept="image/*" id="snapInput"></div>'+
         '<div style="text-align:center;margin:-4px 0 14px;"><button class="link-btn" id="switchToText">影唔到？打字講俾我聽</button></div>';
     }else{
       html += '<div class="chat-row"><div class="chat-avatar">🤖</div><div class="chat-bubble">呢度影相分析暫時未開放，不過唔緊要——打字話俾我知食咗咩，一樣幫你計。</div></div>';
